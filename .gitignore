@@ -1,0 +1,90 @@
+# ============================================================
+# .gitignore — Smart Home AIoT Project
+# ============================================================
+
+# ⚠️ ไฟล์ลับ — ห้าม commit เด็ดขาด
+.env
+*.env
+.env.local
+.env.production
+
+# n8n database (มี API keys + workflow data)
+volumes/n8n/
+volumes/homeassistant/.storage/
+volumes/homeassistant/home-assistant_v2.db
+volumes/homeassistant/home-assistant_v2.db-shm
+volumes/homeassistant/home-assistant_v2.db-wal
+volumes/homeassistant/home-assistant.log*
+volumes/homeassistant/.cloud/
+
+# ⚠️ n8n workflow JSON files — contain Anthropic API keys, LINE tokens, Supabase JWT
+n8n_workflows/*.json
+n8n_workflow_upgrade.json
+n8n_workflow_upgrade.json.bak
+_archive/26may_cleanup/n8n_old_versions/
+_archive/26may_cleanup/HA_old_yaml/n8n_workflow_upgrade*.json
+
+# Mosquitto data
+volumes/mosquitto/data/
+volumes/mosquitto/log/
+
+# ngrok config / logs
+.ngrok2/
+/tmp/ngrok.log
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Backup files
+*.bak
+*.backup
+
+# Home Assistant cache & generated files
+volumes/homeassistant/.cache/
+volumes/homeassistant/custom_components/
+volumes/homeassistant/tts/
+volumes/homeassistant/www/
+volumes/homeassistant/deps/
+
+# Claude settings (local)
+.claude/
+
+# Node dependencies
+node_modules/
+package-lock.json
+
+# Thesis templates & zip archives
+Temp.Pro_II/
+Temp.Pro_II.zip
+
+# Office temp files
+~$*
+
+# Lock files (runtime)
+volumes/homeassistant/.ha_run.lock
+
+# 📦 Local-only references (keep on disk, don't push to GitHub)
+_archive/
+thesisตัวอย่างรุ่นพี่/
+
+# Build artifacts & raw academic binaries (excluded from public portfolio repo)
+# (lambda.zip rebuilds from lambda_function.py; .docx files hold personal/academic info)
+alexa/lambda.zip
+*.docx

@@ -1,0 +1,376 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "home control",
+      "intents": [
+        {
+          "name": "ControlLightIntent",
+          "slots": [
+            { "name": "action", "type": "ActionType" },
+            { "name": "room",   "type": "RoomType"   }
+          ],
+          "samples": [
+            "{action} the {room} light",
+            "{action} {room} light",
+            "{action} the lights in the {room}",
+            "{action} lights in {room}",
+            "{action} lights in the {room}",
+            "{action} the light in {room}",
+            "{action} the light in the {room}",
+            "{room} light {action}",
+            "{room} lights {action}",
+            "{room} light on",
+            "{room} light off",
+            "{action} all lights",
+            "{action} the light"
+          ]
+        },
+        {
+          "name": "ControlFanIntent",
+          "slots": [
+            { "name": "action", "type": "ActionType" },
+            { "name": "room",   "type": "RoomType"   }
+          ],
+          "samples": [
+            "{action} the {room} fan",
+            "{action} {room} fan",
+            "{action} fan in {room}",
+            "{action} fan in the {room}",
+            "{action} the fan in the {room}",
+            "{action} the fan in {room}",
+            "{room} fan {action}",
+            "{room} fan on",
+            "{room} fan off",
+            "{action} all fans",
+            "{action} the fan",
+            "fan {action}",
+            "start the {room} fan",
+            "stop the {room} fan"
+          ]
+        },
+        {
+          "name": "ControlPumpIntent",
+          "slots": [
+            { "name": "action", "type": "ActionType" }
+          ],
+          "samples": [
+            "{action} the water pump",
+            "{action} water pump",
+            "{action} the garden pump",
+            "{action} garden pump",
+            "{action} the pump",
+            "{action} pump",
+            "{action} watering",
+            "{action} the watering",
+            "{action} the sprinkler",
+            "{action} sprinkler",
+            "{action} water the garden",
+            "water the garden",
+            "stop watering the garden",
+            "pump on",
+            "pump off",
+            "start the water pump",
+            "stop the water pump"
+          ]
+        },
+        {
+          "name": "GarageDoorIntent",
+          "slots": [
+            { "name": "doorAction", "type": "GarageActionType" }
+          ],
+          "samples": [
+            "{doorAction} the garage door",
+            "{doorAction} garage door",
+            "{doorAction} the garage",
+            "{doorAction} garage",
+            "{doorAction} the car park door",
+            "garage door {doorAction}",
+            "garage {doorAction}"
+          ]
+        },
+        {
+          "name": "LockDoorIntent",
+          "slots": [
+            { "name": "lockAction", "type": "LockActionType" }
+          ],
+          "samples": [
+            "{lockAction} the front door",
+            "{lockAction} the door",
+            "{lockAction} front door"
+          ]
+        },
+        {
+          "name": "SetModeIntent",
+          "slots": [
+            { "name": "mode", "type": "ModeType" }
+          ],
+          "samples": [
+            "set mode to {mode}",
+            "change mode to {mode}",
+            "switch to {mode} mode",
+            "activate {mode} mode",
+            "set the house to {mode}",
+            "{mode} mode"
+          ]
+        },
+        {
+          "name": "GetStatusIntent",
+          "slots": [],
+          "samples": [
+            "what's the home status",
+            "home status",
+            "check home status",
+            "what mode is the house in",
+            "status"
+          ]
+        },
+        {
+          "name": "GetTemperatureIntent",
+          "slots": [
+            { "name": "room", "type": "RoomType" }
+          ],
+          "samples": [
+            "what's the temperature in the {room}",
+            "{room} temperature",
+            "how hot is the {room}",
+            "temperature in {room}"
+          ]
+        },
+        {
+          "name": "GetHumidityIntent",
+          "slots": [
+            { "name": "room", "type": "RoomType" }
+          ],
+          "samples": [
+            "what's the humidity in the {room}",
+            "{room} humidity",
+            "how humid is the {room}",
+            "humidity in {room}"
+          ]
+        },
+        {
+          "name": "GetGasIntent",
+          "slots": [
+            { "name": "zone", "type": "GasZoneType" }
+          ],
+          "samples": [
+            "is there gas in the {zone}",
+            "check {zone} gas",
+            "{zone} gas level",
+            "is the air safe in the {zone}",
+            "any smoke in the {zone}"
+          ]
+        },
+        {
+          "name": "GetSoilIntent",
+          "slots": [],
+          "samples": [
+            "how is the garden soil",
+            "garden soil moisture",
+            "is the soil dry",
+            "does the garden need water",
+            "check soil"
+          ]
+        },
+        {
+          "name": "WhatIsOnIntent",
+          "slots": [],
+          "samples": [
+            "what's on",
+            "what is on",
+            "what's active",
+            "list active devices",
+            "what is turned on",
+            "which devices are on"
+          ]
+        },
+        {
+          "name": "CurtainIntent",
+          "slots": [
+            { "name": "curtainAction", "type": "CurtainActionType" }
+          ],
+          "samples": [
+            "{curtainAction} the bedroom curtain",
+            "{curtainAction} the curtain",
+            "{curtainAction} curtain",
+            "{curtainAction} bedroom curtains"
+          ]
+        },
+        {
+          "name": "ColorIntent",
+          "slots": [
+            { "name": "color", "type": "ColorType" }
+          ],
+          "samples": [
+            "set the light to {color}",
+            "change color to {color}",
+            "make it {color}",
+            "set living room light to {color}",
+            "turn the light {color}"
+          ]
+        },
+        {
+          "name": "SceneIntent",
+          "slots": [
+            { "name": "scene", "type": "SceneType" }
+          ],
+          "samples": [
+            "activate {scene} scene",
+            "start {scene} scene",
+            "run {scene}",
+            "{scene} mode please",
+            "trigger {scene}",
+            "{scene} scene"
+          ]
+        },
+        {
+          "name": "AllLightsOnIntent",
+          "slots": [],
+          "samples": [
+            "turn on all lights",
+            "all lights on",
+            "lights on"
+          ]
+        },
+        {
+          "name": "AllLightsOffIntent",
+          "slots": [],
+          "samples": [
+            "turn off all lights",
+            "all lights off",
+            "lights off"
+          ]
+        },
+        {
+          "name": "PlayMusicIntent",
+          "slots": [
+            { "name": "mood", "type": "MoodType" }
+          ],
+          "samples": [
+            "play {mood} music",
+            "play music for {mood}",
+            "I want to {mood}",
+            "set {mood} mood",
+            "play some {mood} tunes",
+            "{mood} music please"
+          ]
+        },
+        {
+          "name": "SmartHomeChatIntent",
+          "slots": [
+            { "name": "utterance", "type": "AMAZON.SearchQuery" }
+          ],
+          "samples": [
+            "tell me {utterance}",
+            "ask Chavee {utterance}",
+            "do {utterance}",
+            "Chavee {utterance}",
+            "I want to {utterance}",
+            "please {utterance}",
+            "can you {utterance}"
+          ]
+        },
+        { "name": "AMAZON.HelpIntent",     "samples": [] },
+        { "name": "AMAZON.StopIntent",     "samples": [] },
+        { "name": "AMAZON.CancelIntent",   "samples": [] },
+        { "name": "AMAZON.FallbackIntent", "samples": [] }
+      ],
+      "types": [
+        {
+          "name": "ActionType",
+          "values": [
+            { "name": { "value": "turn on",  "synonyms": ["on", "open",  "switch on",  "start", "enable"] } },
+            { "name": { "value": "turn off", "synonyms": ["off", "close", "switch off", "stop",  "disable"] } }
+          ]
+        },
+        {
+          "name": "RoomType",
+          "values": [
+            { "name": { "value": "living room", "synonyms": ["living", "lounge", "hall"] } },
+            { "name": { "value": "bedroom",     "synonyms": ["bed room", "sleeping room"]  } },
+            { "name": { "value": "kitchen",     "synonyms": ["cook room", "cooking area", "cooking room", "kitten", "chicken", "kit chen", "the kitchen"] } },
+            { "name": { "value": "bathroom",    "synonyms": ["bath room", "washroom", "restroom"] } },
+            { "name": { "value": "garden",      "synonyms": ["yard", "outdoor", "outside"] } },
+            { "name": { "value": "garage",      "synonyms": ["car park"] } },
+            { "name": { "value": "all",         "synonyms": ["every room", "everywhere", "whole house"] } }
+          ]
+        },
+        {
+          "name": "LockActionType",
+          "values": [
+            { "name": { "value": "lock",   "synonyms": ["secure", "bolt"] } },
+            { "name": { "value": "unlock", "synonyms": ["open", "unsecure"] } }
+          ]
+        },
+        {
+          "name": "CurtainActionType",
+          "values": [
+            { "name": { "value": "open",  "synonyms": ["raise", "lift", "up"] } },
+            { "name": { "value": "close", "synonyms": ["shut", "lower", "down"] } }
+          ]
+        },
+        {
+          "name": "GarageActionType",
+          "values": [
+            { "name": { "value": "open",  "synonyms": ["raise", "lift", "up", "rise"] } },
+            { "name": { "value": "close", "synonyms": ["shut", "lower", "down", "drop"] } }
+          ]
+        },
+        {
+          "name": "ModeType",
+          "values": [
+            { "name": { "value": "home",     "synonyms": ["at home", "normal living"] } },
+            { "name": { "value": "away",     "synonyms": ["leaving", "going out", "absent"] } },
+            { "name": { "value": "security", "synonyms": ["secure", "alert", "guard"] } },
+            { "name": { "value": "sleep",    "synonyms": ["sleeping", "night", "bed"] } },
+            { "name": { "value": "relax",    "synonyms": ["relaxing", "chill", "calm"] } },
+            { "name": { "value": "warm",     "synonyms": ["cozy", "warm up"] } },
+            { "name": { "value": "normal",   "synonyms": ["default", "standard", "reset"] } }
+          ]
+        },
+        {
+          "name": "MoodType",
+          "values": [
+            { "name": { "value": "chill",   "synonyms": ["chilling", "relaxing", "lofi"] } },
+            { "name": { "value": "party",   "synonyms": ["dance", "fun", "celebrate"] } },
+            { "name": { "value": "focus",   "synonyms": ["work", "concentrate", "study"] } },
+            { "name": { "value": "sleep",   "synonyms": ["bedtime", "sleeping"] } },
+            { "name": { "value": "morning", "synonyms": ["wake up", "good morning"] } }
+          ]
+        },
+        {
+          "name": "ColorType",
+          "values": [
+            { "name": { "value": "red",        "synonyms": ["crimson", "scarlet"] } },
+            { "name": { "value": "orange",     "synonyms": ["amber"] } },
+            { "name": { "value": "yellow",     "synonyms": ["gold"] } },
+            { "name": { "value": "green",      "synonyms": ["emerald"] } },
+            { "name": { "value": "blue",       "synonyms": ["sky", "azure"] } },
+            { "name": { "value": "purple",     "synonyms": ["violet"] } },
+            { "name": { "value": "pink",       "synonyms": ["rose", "salmon"] } },
+            { "name": { "value": "white",      "synonyms": ["bright"] } },
+            { "name": { "value": "warm white", "synonyms": ["warm", "cozy white"] } }
+          ]
+        },
+        {
+          "name": "SceneType",
+          "values": [
+            { "name": { "value": "party",       "synonyms": ["disco"] } },
+            { "name": { "value": "sunrise",     "synonyms": ["sunrise wake up"] } },
+            { "name": { "value": "welcome",     "synonyms": ["welcome home"] } },
+            { "name": { "value": "alert",       "synonyms": ["red flash", "emergency"] } },
+            { "name": { "value": "calm",        "synonyms": ["relax scene", "zen"] } },
+            { "name": { "value": "default",     "synonyms": ["normal scene"] } }
+          ]
+        },
+        {
+          "name": "GasZoneType",
+          "values": [
+            { "name": { "value": "kitchen", "synonyms": ["cooking area"] } },
+            { "name": { "value": "garage",  "synonyms": ["car park"] } }
+          ]
+        }
+      ]
+    }
+  }
+}

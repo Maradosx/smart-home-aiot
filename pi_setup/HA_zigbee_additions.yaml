@@ -1,0 +1,131 @@
+# ============================================================
+# HA — Zigbee Device Entities
+# ============================================================
+# Additions to HA configuration.yaml — append after pairing devices.
+# Friendly names ตรงกับ Zigbee2MQTT web UI ที่ตั้งไว้
+#
+# หมายเหตุ: Zigbee2MQTT มี HA MQTT discovery → devices จะโผล่เอง
+# YAML นี้ใช้กรณีต้องการ override entity_id หรือเพิ่ม sensor templates
+# ============================================================
+
+# ─── Zigbee MQTT Sensors ────────────────────────────────────
+mqtt:
+  sensor:
+    # Sonoff S26R2ZB Smart Plug #1 — Power monitoring
+    - name: "Demo Plug 1 Power"
+      state_topic: "zigbee2mqtt/demo_plug_1"
+      unit_of_measurement: "W"
+      value_template: "{{ value_json.power }}"
+      device_class: power
+      unique_id: "zb_plug1_power"
+
+    - name: "Demo Plug 1 Voltage"
+      state_topic: "zigbee2mqtt/demo_plug_1"
+      unit_of_measurement: "V"
+      value_template: "{{ value_json.voltage }}"
+      device_class: voltage
+      unique_id: "zb_plug1_voltage"
+
+    - name: "Demo Plug 1 Current"
+      state_topic: "zigbee2mqtt/demo_plug_1"
+      unit_of_measurement: "A"
+      value_template: "{{ value_json.current }}"
+      device_class: current
+      unique_id: "zb_plug1_current"
+
+    - name: "Demo Plug 1 Energy"
+      state_topic: "zigbee2mqtt/demo_plug_1"
+      unit_of_measurement: "kWh"
+      value_template: "{{ value_json.energy }}"
+      device_class: energy
+      state_class: total_increasing
+      unique_id: "zb_plug1_energy"
+
+    # Smart Plug #2 (same fields)
+    - name: "Demo Plug 2 Power"
+      state_topic: "zigbee2mqtt/demo_plug_2"
+      unit_of_measurement: "W"
+      value_template: "{{ value_json.power }}"
+      device_class: power
+      unique_id: "zb_plug2_power"
+
+  binary_sensor:
+    # Sonoff SNZB-05 Water Leak (bathroom)
+    - name: "Bathroom Water Leak"
+      state_topic: "zigbee2mqtt/water_leak"
+      value_template: "{{ value_json.water_leak }}"
+      payload_on: "true"
+      payload_off: "false"
+      device_class: moisture
+      unique_id: "zb_water_leak"
+
+    # Sonoff SNZB-03P Motion Sensor (Living Room secondary)
+    - name: "Living Room Motion Zigbee"
+      state_topic: "zigbee2mqtt/motion_sensor"
+      value_template: "{{ value_json.occupancy }}"
+      payload_on: "true"
+      payload_off: "false"
+      device_class: motion
+      unique_id: "zb_motion_living"
+
+  switch:
+    # Smart Plug #1 control
+    - name: "Demo Plug 1"
+      state_topic: "zigbee2mqtt/demo_plug_1"
+      command_topic: "zigbee2mqtt/demo_plug_1/set"
+      value_template: "{{ value_json.state }}"
+      payload_on: '{"state": "ON"}'
+      payload_off: '{"state": "OFF"}'
+      state_on: "ON"
+      state_off: "OFF"
+      unique_id: "zb_plug1_switch"
+
+    - name: "Demo Plug 2"
+      state_topic: "zigbee2mqtt/demo_plug_2"
+      command_topic: "zigbee2mqtt/demo_plug_2/set"
+      value_template: "{{ value_json.state }}"
+      payload_on: '{"state": "ON"}'
+      payload_off: '{"state": "OFF"}'
+      state_on: "ON"
+      state_off: "OFF"
+      unique_id: "zb_plug2_switch"
+
+  light:
+    # IKEA TRÅDFRI E27 LED bulb (dimmable + color temp)
+    - name: "IKEA TRÅDFRI Bulb"
+      schema: json
+      state_topic: "zigbee2mqtt/ikea_bulb"
+      command_topic: "zigbee2mqtt/ikea_bulb/set"
+      brightness: true
+      color_temp: true
+      effect: false
+      unique_id: "zb_ikea_bulb"
+
+# ─── Zigbee Automation Examples ─────────────────────────────
+# เพิ่มใน automations.yaml หรือ HA Settings → Automations
+
+# automation:
+#   - alias: "Zigbee Water Leak Alert"
+#     trigger:
+#       - platform: state
+#         entity_id: binary_sensor.bathroom_water_leak
+#         to: "on"
+#     action:
+#       - service: notify.line
+#         data:
+#           message: "🚨 น้ำรั่วในห้องน้ำ! เช็คด่วน"
+#       - service: switch.turn_off
+#         entity_id: switch.bath_garden_pump   # ปิดปั๊ม
+#
+#   - alias: "Living Room Auto Light (Zigbee Motion)"
+#     trigger:
+#       - platform: state
+#         entity_id: binary_sensor.living_room_motion_zigbee
+#         to: "on"
+#     condition:
+#       - condition: time
+#         after: "18:00"
+#         before: "23:00"
+#     action:
+#       - service: light.turn_on
+#         entity_id: light.ikea_tradfri_bulb

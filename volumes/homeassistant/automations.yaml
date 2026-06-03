@@ -1,0 +1,362 @@
+# ============================================================
+# Home Assistant — automations.yaml
+# Smart Home AIoT — Automation Rules
+# ============================================================
+
+# ─── [1] TEMPERATURE CONTROL ─────────────────────────────────
+- id: "auto_fan_temperature"
+  alias: "Auto Fan — Temperature > 30°C"
+  description: "เปิดพัดลมอัตโนมัติเมื่ออุณหภูมิสูงเกิน 30°C"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.living_room_temperature
+      above: 30
+  condition:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: "Home"
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id:
+          - switch.living_room_fan
+          - switch.bedroom_fan
+    - service: rest_command.send_alert
+      data:
+        alert_type: "temp_high"
+        value: "{{ states('sensor.living_room_temperature') }}"
+        room: "living_room"
+
+# ─── [2] MOTION LIGHT ────────────────────────────────────────
+- id: "auto_light_motion_night"
+  alias: "Motion Light — Night Only"
+  description: "เปิดไฟเมื่อตรวจพบการเคลื่อนไหวช่วงกลางคืน"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+  condition:
+    - condition: time
+      after: "20:00:00"
+      before: "06:00:00"
+    - condition: state
+      entity_id: input_select.house_mode
+      state: "Home"
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.living_room_light
+    - service: rest_command.send_alert
+      data:
+        alert_type: "motion_light"
+        value: "on"
+        room: "living_room"
+    - delay:
+        minutes: 5
+    - condition: state
+      entity_id: binary_sensor.living_room_motion
+      state: "off"
+    - service: switch.turn_off
+      target:
+        entity_id: switch.living_room_light
+
+# ─── [3] GAS ALERT ───────────────────────────────────────────
+- id: "auto_gas_alert"
+  alias: "Gas Alert — Emergency Response"
+  description: "เปิดพัดลมครัวทันทีเมื่อตรวจพบแก๊ส"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.kitchen_gas_alert
+      to: "on"
+      for:
+        minutes: 1
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.kitchen_vent_fan
+    - service: rest_command.send_alert
+      data:
+        alert_type: "gas_alert"
+        value: "{{ states('sensor.kitchen_gas_sensor') }}"
+        room: "kitchen"
+    - delay:
+        minutes: 10
+
+# ─── [4] WATER LEAK ALERT ────────────────────────────────────
+- id: "auto_water_leak_alert"
+  alias: "Water Leak Alert"
+  description: "แจ้งเตือนเมื่อตรวจพบน้ำรั่ว"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bathroom_water_leak
+      to: "on"
+      for:
+        minutes: 1
+  action:
+    - service: rest_command.send_alert
+      data:
+        alert_type: "water_leak"
+        value: "detected"
+        room: "bathroom"
+    - delay:
+        minutes: 10
+
+# ─── [5] AWAY MODE ───────────────────────────────────────────
+- id: "auto_away_mode_action"
+  alias: "Away Mode — Turn Off All"
+  description: "ปิดอุปกรณ์ทั้งหมดเมื่อเปิด Away Mode"
+  trigger:
+    - platform: state
+      entity_id: input_select.house_mode
+      to: "Away"
+  action:
+    - service: switch.turn_off
+      target:
+        entity_id:
+          - switch.living_room_light
+          - switch.living_room_fan
+          - switch.bedroom_light
+          - switch.bedroom_fan
+          - switch.kitchen_vent_fan
+    - service: switch.turn_on
+      target:
+        entity_id: switch.front_door_lock
+    - delay: "00:00:03"
+    - service: rest_command.send_alert
+      data:
+        alert_type: "away_on"
+        value: "Away"
+        room: "all"
+
+# ─── [6] SECURITY MODE ───────────────────────────────────────
+- id: "auto_security_door_alert"
+  alias: "Security Mode — Door Open Alert"
+  description: "แจ้งเตือนเมื่อประตูเปิดในโหมด Security"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.front_door
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: "Security"
+  action:
+    - service: rest_command.send_alert
+      data:
+        alert_type: "security_door"
+        value: "{{ now().strftime('%H:%M') }}"
+        room: "frontdoor"
+
+# ─── [7] SLEEP MODE ──────────────────────────────────────────
+- id: "auto_sleep_mode"
+  alias: "Sleep Mode — Reduce Comfort"
+  description: "ปิดไฟหลัก เมื่อเปิด Sleep Mode"
+  trigger:
+    - platform: state
+      entity_id: input_select.comfort_mode
+      to: "Sleep"
+  action:
+    - service: switch.turn_off
+      target:
+        entity_id:
+          - switch.living_room_light
+          - switch.bedroom_light
+    - service: rest_command.send_alert
+      data:
+        alert_type: "sleep_mode"
+        value: "Sleep"
+        room: "all"
+
+# ─── [8] GARDEN PUMP AUTO ────────────────────────────────────
+- id: "auto_garden_pump"
+  alias: "Garden Pump — Soil Moisture < 40%"
+  description: "เปิดปั๊มน้ำอัตโนมัติเมื่อดินแห้ง"
+  mode: single
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.garden_soil_moisture
+      below: 40
+  condition:
+    - condition: time
+      after: "06:00:00"
+      before: "20:00:00"
+  action:
+    - service: rest_command.send_alert
+      data:
+        alert_type: "soil_dry"
+        value: "{{ states('sensor.garden_soil_moisture') }}"
+        room: "garden"
+    - service: switch.turn_on
+      target:
+        entity_id: switch.garden_water_pump
+    - delay:
+        minutes: 10
+    - service: switch.turn_off
+      target:
+        entity_id: switch.garden_water_pump
+    - service: rest_command.send_alert
+      data:
+        alert_type: "pump_done"
+        value: "10"
+        room: "garden"
+
+# ─── [9] GARDEN LIGHT SCHEDULE ───────────────────────────────
+- id: "auto_garden_light_on"
+  alias: "Garden Light ON — 18:00"
+  trigger:
+    - platform: time
+      at: "18:00:00"
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.garden_light
+    - service: rest_command.send_alert
+      data:
+        alert_type: "garden_light_on"
+        value: "18:00"
+        room: "garden"
+
+- id: "auto_garden_light_off"
+  alias: "Garden Light OFF — 23:00"
+  trigger:
+    - platform: time
+      at: "23:00:00"
+  action:
+    - service: switch.turn_off
+      target:
+        entity_id: switch.garden_light
+
+# ─── [10] MORNING ROUTINE ────────────────────────────────────
+- id: "auto_morning_routine"
+  alias: "Morning Routine — 07:00"
+  description: "ปรับบ้านให้พร้อมตอนเช้า"
+  trigger:
+    - platform: time
+      at: "07:00:00"
+  condition:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: "Home"
+  action:
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.comfort_mode
+      data:
+        option: "Normal"
+    - service: rest_command.send_alert
+      data:
+        alert_type: "good_morning"
+        value: "07:00"
+        room: "all"
+
+# ─── Schedule: ปิดไฟทุกคืน 23:00 ────────────────────────────
+- id: "schedule_lights_off_night"
+  alias: "🌙 ปิดไฟทุกห้อง 23:00"
+  description: "ปิดไฟทุกห้องอัตโนมัติตอน 23:00 ทุกคืน"
+  trigger:
+    - platform: time
+      at: "23:00:00"
+  action:
+    - service: switch.turn_off
+      target:
+        entity_id:
+          - switch.living_room_light
+          - switch.bedroom_light
+          - switch.kitchen_vent_fan
+          - switch.garden_light
+    - service: rest_command.send_alert
+      data:
+        alert_type: "lights_off_night"
+        value: "23:00"
+        room: "all"
+
+# ─── Schedule: เปิดปั๊มรดน้ำ 07:00 ──────────────────────────
+- id: "schedule_water_pump_morning"
+  alias: "🌅 รดน้ำอัตโนมัติ 07:00"
+  description: "เปิดปั๊มน้ำตอน 07:00 นาน 10 นาที แล้วปิดเอง"
+  trigger:
+    - platform: time
+      at: "07:00:00"
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.garden_water_pump
+    - delay:
+        minutes: 10
+    - service: switch.turn_off
+      target:
+        entity_id: switch.garden_water_pump
+    - service: rest_command.send_alert
+      data:
+        alert_type: "pump_done"
+        value: "10"
+        room: "garden"
+
+# ─── Alert: ประตูไม่ล็อกนานเกิน 10 นาที ─────────────────────
+- id: "alert_door_unlocked_too_long"
+  alias: "🚪 แจ้งเตือนประตูไม่ล็อกนานเกิน 10 นาที"
+  description: "ถ้าประตูหน้าบ้านไม่ได้ล็อกนานเกิน 10 นาที ให้แจ้ง LINE"
+  trigger:
+    - platform: state
+      entity_id: switch.front_door_lock
+      to: "off"
+      for:
+        minutes: 10
+  condition:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: "Home"
+  action:
+    - service: rest_command.send_alert
+      data:
+        alert_type: "door_open"
+        value: "10"
+        room: "frontdoor"
+
+# ─── GPS: ออกจากบ้าน → Away Mode ────────────────────────────
+- id: "gps_auto_away"
+  alias: "📍 GPS - ออกจากบ้าน → Away Mode"
+  description: "เมื่อ GPS ตรวจจับว่าออกจาก Home Zone → Away Mode"
+  trigger:
+    - platform: state
+      entity_id: person.athit_boonpinit
+      to: "not_home"
+      for:
+        minutes: 2
+  condition:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: "Home"
+  action:
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.house_mode
+      data:
+        option: "Away"
+    - service: rest_command.send_alert
+      data:
+        alert_type: "gps_away"
+        value: "not_home"
+        room: "all"
+
+# ─── GPS: กลับบ้าน → Home Mode ──────────────────────────────
+- id: "gps_auto_home"
+  alias: "🏠 GPS - กลับบ้าน → Home Mode"
+  description: "เมื่อ GPS ตรวจจับว่ากลับเข้า Home Zone → Home Mode"
+  trigger:
+    - platform: state
+      entity_id: person.athit_boonpinit
+      to: "home"
+  action:
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.house_mode
+      data:
+        option: "Home"
+    - service: rest_command.send_alert
+      data:
+        alert_type: "gps_home"
+        value: "home"
+        room: "all"

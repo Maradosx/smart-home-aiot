@@ -1,0 +1,765 @@
+# ============================================================
+# Smart Home AIoT — Professional Dashboard
+# Smart Home: Development of a Home Automation System
+# SYSTEM CONTROLLED BY MOBILE AND VOICE COMMANDS
+# ============================================================
+
+title: Smart Home AIoT
+views:
+
+  # ══════════════════════════════════════════════════════════════
+  # VIEW 1 — MAIN DASHBOARD
+  # ══════════════════════════════════════════════════════════════
+  - title: หน้าหลัก
+    path: overview
+    icon: mdi:home-automation
+    badges: []
+    cards:
+
+      # ── PROJECT HEADER ──────────────────────────────────────────
+      - type: markdown
+        content: >
+          <div style="text-align:center; padding:20px 12px 12px;">
+            <div style="font-size:11px; font-weight:600; letter-spacing:4px; color:#7c8db5; text-transform:uppercase; margin-bottom:6px;">Senior Project · Computer Engineering</div>
+            <div style="font-size:28px; font-weight:900; color:#e8eaf6; margin-bottom:6px; letter-spacing:1px;">🏠 Smart Home <span style="color:#5c6bc0;">AIoT</span></div>
+            <div style="font-size:14px; font-weight:700; color:#90caf9; letter-spacing:1px; margin-bottom:4px;">Development of a Home Automation System</div>
+            <div style="font-size:11px; font-weight:500; letter-spacing:3px; color:#64b5f6; text-transform:uppercase; margin-bottom:12px;">System Controlled by Mobile &amp; Voice Commands</div>
+            <div style="height:2px; background:linear-gradient(to right,transparent,#5c6bc0,#7986cb,#5c6bc0,transparent); margin:8px 0 10px;"></div>
+            <div style="font-size:12px; color:#9fa8da; font-style:italic; line-height:1.6;">สมาร์ทโฮม: การพัฒนาบ้านอัจฉริยะที่ควบคุมด้วยมือถือและคำสั่งเสียง</div>
+            <div style="margin-top:10px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+              <span style="background:rgba(92,107,192,0.2); border:1px solid #5c6bc0; border-radius:20px; padding:3px 12px; font-size:10px; color:#9fa8da;">ESP32</span>
+              <span style="background:rgba(92,107,192,0.2); border:1px solid #5c6bc0; border-radius:20px; padding:3px 12px; font-size:10px; color:#9fa8da;">MQTT</span>
+              <span style="background:rgba(92,107,192,0.2); border:1px solid #5c6bc0; border-radius:20px; padding:3px 12px; font-size:10px; color:#9fa8da;">Home Assistant</span>
+              <span style="background:rgba(92,107,192,0.2); border:1px solid #5c6bc0; border-radius:20px; padding:3px 12px; font-size:10px; color:#9fa8da;">Groq LLaMA 3 70B</span>
+              <span style="background:rgba(92,107,192,0.2); border:1px solid #5c6bc0; border-radius:20px; padding:3px 12px; font-size:10px; color:#9fa8da;">LINE Bot</span>
+              <span style="background:rgba(92,107,192,0.2); border:1px solid #5c6bc0; border-radius:20px; padding:3px 12px; font-size:10px; color:#9fa8da;">Alexa</span>
+            </div>
+          </div>
+
+      # ── SYSTEM MODE STATUS ─────────────────────────────────────
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: input_select.house_mode
+            name: House Mode
+            icon: mdi:home-circle
+          - type: entity
+            entity: input_select.comfort_mode
+            name: Comfort Mode
+            icon: mdi:sofa-single
+
+      # ── SENSOR OVERVIEW ────────────────────────────────────────
+      - type: glance
+        title: 📊 Sensor Overview
+        show_name: true
+        show_state: true
+        columns: 4
+        entities:
+          - entity: sensor.living_room_temperature
+            name: LivingRoom °C
+            icon: mdi:thermometer
+          - entity: sensor.living_room_humidity
+            name: Humidity %
+            icon: mdi:water-percent
+          - entity: sensor.bedroom_temperature
+            name: Bedroom °C
+            icon: mdi:thermometer
+          - entity: sensor.garden_soil_moisture
+            name: Soil %
+            icon: mdi:sprout
+
+      - type: glance
+        show_name: true
+        show_state: true
+        columns: 4
+        entities:
+          - entity: sensor.kitchen_gas_lpg
+            name: Gas ADC
+            icon: mdi:gas-cylinder
+          - entity: binary_sensor.living_room_motion
+            name: PIR Motion
+            icon: mdi:motion-sensor
+          - entity: binary_sensor.front_door
+            name: ประตู
+            icon: mdi:door
+          - entity: binary_sensor.bathroom_water_leak
+            name: Water Leak
+            icon: mdi:water-alert
+
+      # ── QUICK CONTROL ──────────────────────────────────────────
+      - type: markdown
+        content: "### ⚡ Quick Control"
+
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: light.livingroom_rgbw
+            name: 🌈 LR Light
+            icon: mdi:ceiling-light
+            show_state: true
+            tap_action:
+              action: toggle
+          - type: button
+            entity: switch.bedroom_light
+            name: Bedroom Light
+            icon: mdi:lamp
+            show_state: true
+            tap_action:
+              action: toggle
+          - type: button
+            entity: switch.kitchen_light
+            name: Kitchen Light
+            icon: mdi:lightbulb
+            show_state: true
+            tap_action:
+              action: toggle
+          - type: button
+            entity: switch.bathroom_light
+            name: Bath Light
+            icon: mdi:lightbulb
+            show_state: true
+            tap_action:
+              action: toggle
+
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: switch.garden_light
+            name: Garden Light
+            icon: mdi:outdoor-lamp
+            show_state: true
+            tap_action:
+              action: toggle
+          - type: button
+            entity: switch.bedroom_fan
+            name: Bedroom Fan
+            icon: mdi:fan
+            show_state: true
+            tap_action:
+              action: toggle
+          - type: button
+            entity: switch.kitchen_fan
+            name: Kitchen Fan
+            icon: mdi:fan-clock
+            show_state: true
+            tap_action:
+              action: toggle
+          - type: button
+            entity: switch.garage_light
+            name: Garage Light
+            icon: mdi:garage
+            show_state: true
+            tap_action:
+              action: toggle
+
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: switch.garden_water_pump
+            name: 💧 Water Pump
+            icon: mdi:water-pump
+            show_state: true
+            tap_action:
+              action: toggle
+          - type: button
+            entity: cover.bedroom_curtain
+            name: 🪟 ม่าน
+            icon: mdi:curtains
+            show_state: true
+            tap_action:
+              action: toggle
+          - type: button
+            entity: cover.garage_door
+            name: 🚗 Garage Door
+            icon: mdi:garage-open
+            show_state: true
+            tap_action:
+              action: toggle
+          - type: entity
+            entity: binary_sensor.front_door
+            name: 🚪 ประตู
+            icon: mdi:door
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: binary_sensor.kitchen_gas_alert
+            name: ⚠️ Gas (ครัว)
+            icon: mdi:gas-cylinder
+          - type: entity
+            entity: binary_sensor.garage_smoke_alert
+            name: ⚠️ Smoke (รถ)
+            icon: mdi:smoke-detector
+          - type: entity
+            entity: binary_sensor.bathroom_water_leak
+            name: 💧 Water Leak
+            icon: mdi:water-alert
+          - type: entity
+            entity: binary_sensor.bathroom_fall_alert
+            name: 🚨 Fall
+            icon: mdi:human-cane
+
+      # ── AI ASSISTANT INFO ──────────────────────────────────────
+      - type: markdown
+        content: >
+          <div style="padding:12px 14px;border-left:3px solid #5c6bc0;background:rgba(92,107,192,0.08);border-radius:6px;">
+            <div style="font-size:13px;color:#9fa8da;font-weight:600;">🤖 AI Assistant: <strong style="color:#c5cae9;">ชาวี</strong></div>
+            <div style="font-size:11px;color:#7986cb;margin-top:4px;">Groq LLaMA 3 70B (Meta) · n8n (Railway) · LINE Bot · Alexa Custom Skill</div>
+            <div style="font-size:11px;color:#546e7a;margin-top:4px;">ส่งข้อความใน LINE เพื่อสั่งการ เช่น "เปิดไฟ", "ปิดพัดลม", "สรุปสถานะบ้าน" | สั่งเสียง Alexa ได้</div>
+          </div>
+
+  # ══════════════════════════════════════════════════════════════
+  # VIEW 2 — ROOMS (แยกห้อง) — Floor Plan Layout
+  # ══════════════════════════════════════════════════════════════
+  - title: แยกห้อง
+    path: rooms
+    icon: mdi:floor-plan
+    badges: []
+    cards:
+
+      # ── FLOOR PLAN HEADER ───────────────────────────────────────
+      - type: markdown
+        content: >
+          <div style="text-align:center;padding:10px 8px 4px;">
+            <div style="font-size:16px;font-weight:700;color:#e8eaf6;">📐 Floor Plan — แผนผังบ้าน</div>
+            <div style="font-size:11px;color:#7986cb;margin-top:4px;">อุปกรณ์แยกตามห้อง · Devices by Room</div>
+            <div style="height:1px;background:linear-gradient(to right,transparent,#5c6bc0,transparent);margin:8px 0 0;"></div>
+          </div>
+
+      # ── ROW 1: LIVING ROOM + BEDROOM ───────────────────────────
+      - type: horizontal-stack
+        cards:
+
+          # ── LIVING ROOM ──────────────────────────────────────
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >
+                  <div style="background:linear-gradient(135deg,#1565c0,#1976d2);padding:10px 14px;border-radius:10px 10px 0 0;margin-bottom:-2px;">
+                    <div style="font-size:15px;font-weight:800;color:white;">🛋️ ห้องนั่งเล่น</div>
+                    <div style="font-size:10px;color:#bbdefb;margin-top:2px;">Living Room</div>
+                  </div>
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 5
+                entities:
+                  - entity: sensor.living_room_temperature
+                    name: อุณหภูมิ
+                    icon: mdi:thermometer
+                  - entity: sensor.living_room_humidity
+                    name: ความชื้น
+                    icon: mdi:water-percent
+                  - entity: sensor.living_room_air_quality
+                    name: Air ADC
+                    icon: mdi:air-filter
+                  - entity: sensor.living_room_ldr
+                    name: LDR
+                    icon: mdi:brightness-6
+                  - entity: binary_sensor.living_room_motion
+                    name: Motion
+                    icon: mdi:motion-sensor
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: light.livingroom_rgbw
+                    name: 💡 ไฟ IKEA RGBW (Zigbee)
+                    secondary_info: last-changed
+                  - entity: switch.livingroom_fan_plug
+                    name: 🌀 พัดลม (Zigbee Plug)
+                    secondary_info: last-changed
+                  - entity: switch.livingroom_purifier_plug
+                    name: 🌬️ เครื่องฟอกอากาศ (Zigbee)
+                    secondary_info: last-changed
+                  - entity: binary_sensor.living_room_air_alert
+                    name: ⚠️ Air Quality Alert
+                    secondary_info: last-changed
+
+          # ── BEDROOM + ENTRANCE ─────────────────────────────
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >
+                  <div style="background:linear-gradient(135deg,#4a148c,#6a1b9a);padding:10px 14px;border-radius:10px 10px 0 0;margin-bottom:-2px;">
+                    <div style="font-size:15px;font-weight:800;color:white;">🛏️ ห้องนอน & 🚪 ทางเข้า</div>
+                    <div style="font-size:10px;color:#e1bee7;margin-top:2px;">Bedroom & Entrance</div>
+                  </div>
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 5
+                entities:
+                  - entity: sensor.bedroom_temperature
+                    name: อุณหภูมิ
+                    icon: mdi:thermometer
+                  - entity: sensor.bedroom_humidity
+                    name: ความชื้น
+                    icon: mdi:water-percent
+                  - entity: sensor.bedroom_ldr
+                    name: LDR
+                    icon: mdi:brightness-6
+                  - entity: binary_sensor.bedroom_presence
+                    name: Presence
+                    icon: mdi:motion-sensor
+                  - entity: binary_sensor.front_door
+                    name: ประตูหน้า
+                    icon: mdi:door
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: switch.bedroom_light
+                    name: 💡 ไฟห้องนอน
+                    secondary_info: last-changed
+                  - entity: switch.bedroom_fan
+                    name: 🌀 พัดลมห้องนอน
+                    secondary_info: last-changed
+                  - entity: cover.bedroom_curtain
+                    name: 🪟 ม่านห้องนอน (Servo)
+                    secondary_info: last-changed
+                  - entity: binary_sensor.bedroom_fall_alert
+                    name: 🚨 Fall Alert (LD2410)
+                    secondary_info: last-changed
+
+      # ── ROW 2: KITCHEN + BATHROOM ──────────────────────────────
+      - type: horizontal-stack
+        cards:
+
+          # ── KITCHEN ────────────────────────────────────────
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >
+                  <div style="background:linear-gradient(135deg,#e65100,#f57c00);padding:10px 14px;border-radius:10px 10px 0 0;margin-bottom:-2px;">
+                    <div style="font-size:15px;font-weight:800;color:white;">🍳 ห้องครัว</div>
+                    <div style="font-size:10px;color:#ffe0b2;margin-top:2px;">Kitchen</div>
+                  </div>
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 3
+                entities:
+                  - entity: sensor.kitchen_temperature
+                    name: อุณหภูมิ
+                    icon: mdi:thermometer
+                  - entity: sensor.kitchen_humidity
+                    name: ความชื้น
+                    icon: mdi:water-percent
+                  - entity: sensor.kitchen_ldr
+                    name: LDR
+                    icon: mdi:brightness-6
+              - type: gauge
+                entity: sensor.kitchen_gas_lpg
+                name: Gas Level (ADC)
+                min: 0
+                max: 4095
+                severity:
+                  green: 0
+                  yellow: 1500
+                  red: 2500
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: switch.kitchen_light
+                    name: 💡 ไฟห้องครัว
+                    secondary_info: last-changed
+                  - entity: switch.kitchen_fan
+                    name: 💨 พัดลมระบายอากาศ
+                    secondary_info: last-changed
+                  - entity: switch.kitchen_stove
+                    name: 🔥 เตา (Simulator)
+                    secondary_info: last-changed
+                  - entity: binary_sensor.kitchen_gas_alert
+                    name: ⚠️ Gas Alert
+                    secondary_info: last-changed
+
+          # ── BATHROOM ───────────────────────────────────────
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >
+                  <div style="background:linear-gradient(135deg,#006064,#00838f);padding:10px 14px;border-radius:10px 10px 0 0;margin-bottom:-2px;">
+                    <div style="font-size:15px;font-weight:800;color:white;">🚿 ห้องน้ำ</div>
+                    <div style="font-size:10px;color:#b2ebf2;margin-top:2px;">Bathroom</div>
+                  </div>
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 3
+                entities:
+                  - entity: binary_sensor.bathroom_presence
+                    name: Presence
+                    icon: mdi:motion-sensor
+                  - entity: binary_sensor.bathroom_fall_alert
+                    name: Fall Alert
+                    icon: mdi:human-cane
+                  - entity: sensor.bathroom_ldr
+                    name: LDR
+                    icon: mdi:brightness-6
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: switch.bathroom_light
+                    name: 💡 ไฟห้องน้ำ (LD2410)
+                    secondary_info: last-changed
+                  - entity: binary_sensor.bathroom_water_leak
+                    name: 💧 Water Leak (SNZB-05)
+                    secondary_info: last-changed
+
+      # ── ROW 3: GARDEN (full width) ─────────────────────────────
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: >
+              <div style="background:linear-gradient(135deg,#1b5e20,#2e7d32);padding:10px 14px;border-radius:10px 10px 0 0;margin-bottom:-2px;">
+                <div style="font-size:15px;font-weight:800;color:white;">🌿 สวน</div>
+                <div style="font-size:10px;color:#c8e6c9;margin-top:2px;">Garden</div>
+              </div>
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.garden_soil_moisture
+                name: Soil Moisture (%)
+                min: 0
+                max: 100
+                severity:
+                  green: 60
+                  yellow: 30
+                  red: 0
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.garden_soil_raw
+                    name: 🔬 Soil Raw (ADC)
+                    secondary_info: last-changed
+                  - entity: switch.garden_water_pump
+                    name: 💧 Water Pump (Auto)
+                    secondary_info: last-changed
+                  - entity: switch.garden_light
+                    name: 💡 ไฟสวน
+                    secondary_info: last-changed
+                  - entity: switch.garden_pathway_light
+                    name: 🔆 ไฟทางเดินสวน
+                    secondary_info: last-changed
+
+      # ── ROW 4: GARAGE (full width) ─────────────────────────────
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: >
+              <div style="background:linear-gradient(135deg,#37474f,#546e7a);padding:10px 14px;border-radius:10px 10px 0 0;margin-bottom:-2px;">
+                <div style="font-size:15px;font-weight:800;color:white;">🚗 โรงรถ</div>
+                <div style="font-size:10px;color:#cfd8dc;margin-top:2px;">Garage · ESP32 #5</div>
+              </div>
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.garage_smoke_lpg
+                name: Smoke/Gas (ADC)
+                min: 0
+                max: 4095
+                severity:
+                  green: 0
+                  yellow: 1500
+                  red: 2500
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: cover.garage_door
+                    name: 🚗 ประตูโรงรถ (Servo)
+                    secondary_info: last-changed
+                  - entity: switch.garage_light
+                    name: 💡 ไฟโรงรถ
+                    secondary_info: last-changed
+                  - entity: switch.garage_pathway_light
+                    name: 🔆 ไฟทางเดินรถ
+                    secondary_info: last-changed
+                  - entity: binary_sensor.garage_smoke_alert
+                    name: ⚠️ Smoke Alert (MQ-2)
+                    secondary_info: last-changed
+                  - entity: binary_sensor.garage_motion
+                    name: 🚨 PIR Motion
+                    secondary_info: last-changed
+                  - entity: sensor.garage_ldr
+                    name: 🔆 LDR (แสง)
+                    secondary_info: last-changed
+
+  # ══════════════════════════════════════════════════════════════
+  # VIEW 3 — GRAPHS
+  # ══════════════════════════════════════════════════════════════
+  - title: กราฟ
+    path: history
+    icon: mdi:chart-line
+    badges: []
+    cards:
+
+      # ── HEADER ──────────────────────────────────────────────────
+      - type: markdown
+        content: >
+          <div style="text-align:center; padding:16px 12px 8px;">
+            <div style="font-size:22px; font-weight:800; color:#e8eaf6; margin-bottom:4px;">📊 Sensor History</div>
+            <div style="font-size:12px; color:#7c8db5; letter-spacing:2px; text-transform:uppercase;">Real-time Environmental Data</div>
+            <div style="height:2px; background:linear-gradient(to right,transparent,#5c6bc0,#7986cb,#5c6bc0,transparent); margin:10px 0 4px;"></div>
+          </div>
+
+      # ── CURRENT VALUES (Snapshot) ────────────────────────────────
+      - type: horizontal-stack
+        cards:
+          - type: sensor
+            entity: sensor.living_room_temperature
+            name: ห้องนั่งเล่น
+            icon: mdi:thermometer
+            graph: line
+          - type: sensor
+            entity: sensor.bedroom_temperature
+            name: ห้องนอน
+            icon: mdi:thermometer
+            graph: line
+
+      - type: horizontal-stack
+        cards:
+          - type: sensor
+            entity: sensor.living_room_humidity
+            name: LR ความชื้น
+            icon: mdi:water-percent
+            graph: line
+          - type: sensor
+            entity: sensor.kitchen_temperature
+            name: Kitchen °C
+            icon: mdi:thermometer
+            graph: line
+          - type: sensor
+            entity: sensor.garden_soil_moisture
+            name: ความชื้นดิน
+            icon: mdi:sprout
+            graph: line
+          - type: sensor
+            entity: sensor.kitchen_gas_lpg
+            name: แก๊สครัว
+            icon: mdi:gas-cylinder
+            graph: line
+
+      # ── TEMPERATURE GRAPH ─────────────────────────────────────────
+      - type: history-graph
+        title: 🌡️ อุณหภูมิ (°C) — ทุกห้อง
+        hours_to_show: 24
+        refresh_interval: 30
+        entities:
+          - entity: sensor.living_room_temperature
+            name: ห้องนั่งเล่น
+          - entity: sensor.bedroom_temperature
+            name: ห้องนอน
+          - entity: sensor.kitchen_temperature
+            name: ห้องครัว
+
+      # ── HUMIDITY GRAPH ────────────────────────────────────────────
+      - type: history-graph
+        title: 💧 ความชื้นอากาศ (%) — ทุกห้อง
+        hours_to_show: 24
+        refresh_interval: 30
+        entities:
+          - entity: sensor.living_room_humidity
+            name: ห้องนั่งเล่น
+          - entity: sensor.bedroom_humidity
+            name: ห้องนอน
+          - entity: sensor.kitchen_humidity
+            name: ห้องครัว
+
+      # ── SOIL MOISTURE GRAPH ───────────────────────────────────────
+      - type: history-graph
+        title: 🌱 ความชื้นดิน (%)
+        hours_to_show: 24
+        refresh_interval: 60
+        entities:
+          - entity: sensor.garden_soil_moisture
+            name: สวน
+
+      # ── GAS SENSOR GRAPH ──────────────────────────────────────────
+      - type: history-graph
+        title: 🚨 ระดับแก๊ส — ครัว & โรงรถ (ADC)
+        hours_to_show: 24
+        refresh_interval: 30
+        entities:
+          - entity: sensor.kitchen_gas_lpg
+            name: ห้องครัว (MQ-2)
+          - entity: sensor.garage_smoke_lpg
+            name: โรงรถ (MQ-2)
+
+  # ══════════════════════════════════════════════════════════════
+  # VIEW 4 — PROJECT INFO
+  # ══════════════════════════════════════════════════════════════
+  - title: โปรเจค
+    path: about
+    icon: mdi:information-outline
+    badges: []
+    cards:
+
+      - type: markdown
+        content: >
+          <div style="text-align:center;padding:28px 12px 16px;">
+            <div style="font-size:56px;margin-bottom:12px;">🏠</div>
+            <div style="font-size:24px;font-weight:900;color:#e8eaf6;margin-bottom:6px;letter-spacing:1px;">Smart Home <span style="color:#5c6bc0;">AIoT</span></div>
+            <div style="font-size:14px;font-weight:700;color:#90caf9;margin-bottom:6px;">Development of a Home Automation System</div>
+            <div style="font-size:11px;letter-spacing:3px;color:#64b5f6;text-transform:uppercase;margin-bottom:16px;">System Controlled by Mobile &amp; Voice Commands</div>
+            <div style="height:2px;background:linear-gradient(to right,transparent,#5c6bc0,#7986cb,#5c6bc0,transparent);margin:12px 0 14px;"></div>
+            <div style="font-size:13px;color:#9fa8da;font-style:italic;line-height:1.8;">
+              สมาร์ทโฮม: การพัฒนาบ้านอัจฉริยะ<br>ที่ควบคุมด้วยมือถือและคำสั่งเสียง
+            </div>
+          </div>
+
+      - type: markdown
+        content: >
+          ### 🏗️ System Architecture
+
+          | Layer | Technology | Detail |
+          |---|---|---|
+          | 🔧 Hardware | ESP32 DevKit V1 × 5 | ESP32-WROOM-32 · WiFi 2.4GHz · MQTT Client |
+          | 🌡️ Sensor | DHT22 × 3 | อุณหภูมิ+ความชื้น (ห้องนอน · ห้องนั่งเล่น · ครัว) |
+          | 👁️ Sensor | HLK-LD2410C × 2 | mmWave Presence + Fall Detection (ห้องนอน · ห้องน้ำ) |
+          | 🌬️ Sensor | MQ-2 × 2 · MQ-135 × 1 | แก๊ส LPG (ครัว · โรงรถ) · คุณภาพอากาศ (ห้องนั่งเล่น) |
+          | 🌱 Sensor | Soil Moisture v1.2 · LDR × 5 | ความชื้นดินสวน · แสงสว่าง (ทุก ESP32) |
+          | 💡 Actuator | LED 5mm × 7 (direct GPIO) | ห้องนอน · ครัว · ห้องน้ำ · สวน · ทางเดินสวน · โรงรถ · ทางเดินรถ |
+          | 🔁 Actuator | Relay 1CH × 4 (Active LOW) | พัดลมห้องนอน · พัดลมครัว · ปั๊มน้ำ · เตาครัว (Simulator) |
+          | 🔄 Actuator | Servo SG90 (PWM 50Hz) × 2 | ม่านห้องนอน (GPIO25) · ประตูโรงรถ 360° (GPIO26) |
+          | 💡 Zigbee | IKEA TRÅDFRI RGBW E27 × 1 | หลอดไฟ RGB ห้องนั่งเล่น (เท่านั้น) |
+          | 🔌 Zigbee | Sonoff S26R2ZB × 2 | Smart Plug: พัดลม LR · เครื่องฟอกอากาศ LR |
+          | 📡 Zigbee | SNZB-03P · SNZB-04 · SNZB-05 | PIR Motion (LR) · Door Sensor (ทางเข้า) · Water Leak (ห้องน้ำ) |
+          | 🎯 Zigbee | ZBDongle-P + Pi Zero 2W | Zigbee Coordinator + Zigbee2MQTT Bridge |
+          | 📮 Protocol | MQTT · Mosquitto (AWS EC2) | Broker: 54.226.244.180:1883 · Publish/Subscribe |
+          | 🏠 Platform | Home Assistant 2026.3 (Docker · EC2) | Dashboard · 15 Automations · Emulated Hue |
+          | ⚙️ Automation | n8n Workflow (Railway Cloud) | Webhook · LINE Reply · HA REST API · Conversation Memory |
+          | 🤖 AI Engine | Groq + Meta LLaMA 3 70B (llama3-70b-8192) | NLP ภาษาไทย · JSON Intent Analysis · Context Memory |
+          | 🗣️ Voice | Alexa Custom Skill + AWS Lambda | สั่งงานด้วยเสียง · Amazon Echo |
+          | 💬 Interface | LINE Bot (ชาวี) + Emulated Hue | Mobile · ภาษาไทย · Alexa fallback |
+
+      - type: markdown
+        content: >
+          ### 🏠 Device Map — แผนที่อุปกรณ์
+
+          | ห้อง | ESP32 | Sensor | Actuator (ESP32) | Actuator (Zigbee) |
+          |---|---|---|---|---|
+          | 🛏️ ห้องนอน | #1 | DHT22(GPIO4) · LD2410(GPIO16/17) · LDR(GPIO36) | LED ไฟ(GPIO2) · Servo ม่าน(GPIO25) · Relay พัดลม(GPIO26) | — |
+          | 🛋️ ห้องนั่งเล่น | #2 | DHT22(GPIO4) · MQ-135(GPIO27/35) · LDR(GPIO36) | — (sensors only) | IKEA RGBW · S26R2ZB ×2 · SNZB-03P |
+          | 🍳 ห้องครัว | #3 | DHT22(GPIO4) · MQ-2(GPIO13/34) · LDR(GPIO36) | LED ไฟ(GPIO2) · Relay เตา(GPIO25) · Relay พัดลม(GPIO26) | — |
+          | 🚿 ห้องน้ำ | #4 | LD2410(GPIO16/17) · LDR(GPIO36) | LED ไฟน้ำ(GPIO2) | SNZB-05 Water Leak |
+          | 🌿 สวน | #4 | Soil Moisture(GPIO32) · LDR(GPIO36) | Relay ปั๊ม(GPIO26) · LED สวน(GPIO27) · LED ทางเดินสวน(GPIO25) | — |
+          | 🚗 โรงรถ | #5 | MQ-2(GPIO13/34) · PIR(GPIO27) · LDR(GPIO36) | LED โรงรถ(GPIO2) · LED ทางเดินรถ(GPIO25) · Servo 360° ประตู(GPIO26) | — |
+          | 🚪 ทางเข้า | — | SNZB-04 Door Sensor (Zigbee) | — | — |
+
+      - type: markdown
+        content: >
+          ### 🤖 AI Assistant: ชาวี (LINE Bot · Groq LLaMA 3 70B)
+
+          | ความสามารถ | รายละเอียด |
+          |---|---|
+          | 💡 ควบคุมไฟ | เปิด/ปิด LED ทุกห้อง (direct GPIO) + IKEA RGBW (ห้องนั่งเล่น) |
+          | 🌀 ควบคุมพัดลม | Relay (ห้องนอน · ครัว) + Zigbee Plug S26R2ZB (ห้องนั่งเล่น) |
+          | 🪟 ควบคุมม่าน | เปิด/ปิดม่านห้องนอน (Servo SG90 · GPIO25) |
+          | 🚗 ประตูโรงรถ | OPEN / CLOSE / STOP (Servo SG90 360° + Time-based) |
+          | 💧 ควบคุมปั๊มน้ำ | เปิด/ปิดปั๊มสวน (Auto soil moisture < 30%) |
+          | 🔥 เตาครัว Sim | สั่งเปิด/ปิด Relay เตา (simulator demo) |
+          | 😌 Comfort Mode | Relax / Warm / Sleep (ปรับไฟ+พัดลม+ม่านอัตโนมัติ) |
+          | 🏠 ตั้งโหมดบ้าน | Home / Away (GPS auto) / Security (manual) |
+          | 📊 อ่านค่า Sensor | อุณหภูมิ · ความชื้น · แก๊ส · ความชื้นดิน · ประตู · LDR |
+          | 🚨 แจ้งเตือนอัตโนมัติ | Gas · Smoke · Water Leak · Soil Dry · Fall Detection |
+          | 🗣️ Alexa Voice | สั่งงานด้วยเสียง (Amazon Echo · Custom Skill + Emulated Hue) |
+          | 🧠 AI Intent | Groq LLaMA 3 70B (llama3-70b-8192) · JSON response · ภาษาไทย + อังกฤษ |
+          | ⚡ n8n Workflow | LINE Webhook → Groq LLaMA API → HA REST → LINE Reply |
+
+      - type: markdown
+        content: >
+          ### 📡 MQTT Topic Map
+
+          **ESP32 #1 — ห้องนอน** `Client: esp32-bedroom`
+
+          | Topic | Dir | GPIO | คำอธิบาย |
+          |---|---|---|---|
+          | `home/bedroom/temperature` | → HA | 4 | DHT22 อุณหภูมิ °C |
+          | `home/bedroom/humidity` | → HA | 4 | DHT22 ความชื้น % |
+          | `home/bedroom/presence` | → HA | 16/17 | mmWave LD2410C presence ON/OFF |
+          | `home/bedroom/fall_alert` | → HA | 16/17 | LD2410C ตรวจจับล้ม ON/OFF |
+          | `home/bedroom/ldr` | → HA | 36 | แสงสว่าง ADC 0-4095 |
+          | `home/bedroom/light/state` | → HA | 2 | LED ไฟห้องนอน ON/OFF |
+          | `home/bedroom/fan/state` | → HA | 26 | Relay พัดลม ON/OFF |
+          | `home/bedroom/curtain/state` | → HA | 25 | Servo ม่าน OPEN/CLOSED |
+          | `home/bedroom/light/set` | HA → | 2 | สั่ง LED ห้องนอน |
+          | `home/bedroom/fan/set` | HA → | 26 | สั่งพัดลม |
+          | `home/bedroom/curtain/set` | HA → | 25 | สั่งม่าน OPEN/CLOSE/STOP |
+
+          **ESP32 #2 — ห้องนั่งเล่น (Sensors only)** `Client: esp32-livingroom`
+
+          | Topic | Dir | GPIO | คำอธิบาย |
+          |---|---|---|---|
+          | `home/livingroom/temperature` | → HA | 4 | DHT22 อุณหภูมิ °C |
+          | `home/livingroom/humidity` | → HA | 4 | DHT22 ความชื้น % |
+          | `home/livingroom/air_quality` | → HA | 35 | MQ-135 ADC raw 0-4095 |
+          | `home/livingroom/air_alert` | → HA | 27 | คุณภาพอากาศเกิน ON/OFF |
+          | `home/livingroom/ldr` | → HA | 36 | แสงสว่าง ADC 0-4095 |
+
+          **ESP32 #3 — ห้องครัว** `Client: esp32-kitchen`
+
+          | Topic | Dir | GPIO | คำอธิบาย |
+          |---|---|---|---|
+          | `home/kitchen/temperature` | → HA | 4 | DHT22 อุณหภูมิ °C |
+          | `home/kitchen/humidity` | → HA | 4 | DHT22 ความชื้น % |
+          | `home/kitchen/gas_lpg` | → HA | 34 | MQ-2 ADC raw 0-4095 |
+          | `home/kitchen/gas_alert` | → HA | 13 | แก๊สเกิน threshold ON/OFF |
+          | `home/kitchen/ldr` | → HA | 36 | แสงสว่าง ADC 0-4095 |
+          | `home/kitchen/light/state` | → HA | 2 | LED ไฟครัว ON/OFF |
+          | `home/kitchen/fan/state` | → HA | 26 | Relay พัดลมครัว ON/OFF |
+          | `home/kitchen/stove/state` | → HA | 25 | Relay เตา simulator ON/OFF |
+          | `home/kitchen/light/set` | HA → | 2 | สั่ง LED ครัว |
+          | `home/kitchen/fan/set` | HA → | 26 | สั่งพัดลมครัว |
+          | `home/kitchen/stove/set` | HA → | 25 | สั่ง stove relay |
+
+          **ESP32 #4 — ห้องน้ำ + สวน** `Client: esp32-bathroom`
+
+          | Topic | Dir | GPIO | คำอธิบาย |
+          |---|---|---|---|
+          | `home/bathroom/presence` | → HA | 16/17 | mmWave LD2410C presence ON/OFF |
+          | `home/bathroom/fall_alert` | → HA | 16/17 | LD2410C ตรวจจับล้ม ON/OFF |
+          | `home/bathroom/light/state` | → HA | 2 | LED ไฟห้องน้ำ ON/OFF |
+          | `home/bathroom/ldr` | → HA | 36 | แสงสว่าง ADC 0-4095 |
+          | `home/garden/soil_moisture` | → HA | 32 | ความชื้นดิน % (avg 10 samples) |
+          | `home/garden/soil_raw` | → HA | 32 | Soil ADC raw 0-4095 |
+          | `home/garden/pump_state` | → HA | 26 | Relay ปั๊มน้ำ ON/OFF |
+          | `home/garden/light/state` | → HA | 27 | LED ไฟสวน ON/OFF |
+          | `home/garden/pathway/state` | → HA | 25 | LED ทางเดินสวน ON/OFF |
+          | `home/bathroom/light/set` | HA → | 2 | สั่ง LED ห้องน้ำ |
+          | `home/garden/pump/set` | HA → | 26 | สั่งปั๊มน้ำ |
+          | `home/garden/light/set` | HA → | 27 | สั่ง LED สวน |
+          | `home/garden/pathway/set` | HA → | 25 | สั่ง LED ทางเดินสวน |
+
+          **ESP32 #5 — โรงรถ** `Client: esp32-garage`
+
+          | Topic | Dir | GPIO | คำอธิบาย |
+          |---|---|---|---|
+          | `home/garage/smoke_lpg` | → HA | 34 | MQ-2 ADC raw 0-4095 |
+          | `home/garage/smoke_alert` | → HA | 13 | ควัน/แก๊สเกิน ON/OFF |
+          | `home/garage/motion` | → HA | 27 | PIR motion ON/OFF |
+          | `home/garage/door/state` | → HA | 26 | OPEN/CLOSED/OPENING/CLOSING/STOPPED |
+          | `home/garage/light/state` | → HA | 2 | LED ไฟโรงรถ ON/OFF |
+          | `home/garage/pathway/state` | → HA | 25 | LED ทางเดินรถ ON/OFF |
+          | `home/garage/ldr` | → HA | 36 | แสงสว่าง ADC 0-4095 |
+          | `home/garage/door/set` | HA → | 26 | OPEN / CLOSE / STOP |
+          | `home/garage/light/set` | HA → | 2 | สั่ง LED โรงรถ |
+          | `home/garage/pathway/set` | HA → | 25 | สั่ง LED ทางเดินรถ |
+
+          **Zigbee (Zigbee2MQTT + Pi Zero 2W) — ห้องนั่งเล่น + ทางเข้า + ห้องน้ำ**
+
+          | Device | Zigbee2MQTT Topic | Entity HA | คำอธิบาย |
+          |---|---|---|---|
+          | IKEA TRÅDFRI RGBW E27 | `zigbee2mqtt/livingroom_light` | `light.livingroom_rgbw` | RGB Bulb ห้องนั่งเล่น |
+          | Sonoff S26R2ZB #1 | `zigbee2mqtt/livingroom_fan_plug` | `switch.livingroom_fan_plug` | Smart Plug พัดลม LR |
+          | Sonoff S26R2ZB #2 | `zigbee2mqtt/livingroom_purifier_plug` | `switch.livingroom_purifier_plug` | Smart Plug เครื่องฟอก LR |
+          | SNZB-03P PIR | `zigbee2mqtt/livingroom_pir` | `binary_sensor.living_room_motion` | Motion ห้องนั่งเล่น |
+          | SNZB-04 Door | `zigbee2mqtt/front_door_sensor` | `binary_sensor.front_door` | ประตูหน้าบ้าน |
+          | SNZB-05 Leak | `zigbee2mqtt/bathroom_water_leak` | `binary_sensor.bathroom_water_leak` | น้ำรั่วห้องน้ำ |
+
+          **Broadcast (ทุก ESP32 subscribe)**
+
+          | Topic | คำอธิบาย |
+          |---|---|
+          | `home/broadcast/bedroom/light/set` | สั่ง LED ห้องนอนจาก HA ทั่วถึง |
+          | `home/broadcast/kitchen/light/set` | สั่ง LED ครัวจาก HA ทั่วถึง |
+          | `home/broadcast/garden/light/set` | สั่ง LED สวนจาก HA ทั่วถึง |
+          | `home/broadcast/#` | wildcard — สั่งทุกห้องพร้อมกัน |

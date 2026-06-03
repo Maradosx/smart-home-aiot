@@ -1,0 +1,160 @@
+# ============================================================
+# Docker Compose — Smart Home AIoT Stack (macOS)
+# ============================================================
+# Services:
+#   - Home Assistant      → http://localhost:8123
+#   - Mosquitto MQTT      → localhost:1883
+#   - Zigbee2MQTT         → http://localhost:8080
+#   - n8n                 → http://localhost:5678
+#
+# Setup (macOS):
+#   1. Install Docker Desktop: https://www.docker.com/products/docker-desktop/
+#   2. cp .env.example .env  →  แก้ค่าใน .env
+#   3. mkdir -p ./volumes/{homeassistant,mosquitto/{config,data,log},zigbee2mqtt,n8n}
+#   4. cp mosquitto.conf ./volumes/mosquitto/config/
+#   5. docker compose up -d
+# ============================================================
+
+version: "3.8"
+
+networks:
+  smarthome:
+    driver: bridge
+
+volumes:
+  ha_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/homeassistant
+  mosquitto_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/mosquitto/config
+  mosquitto_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/mosquitto/data
+  mosquitto_log:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/mosquitto/log
+  zigbee2mqtt_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/zigbee2mqtt
+  n8n_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/n8n
+
+services:
+  # ─── Home Assistant ─────────────────────────────────────
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    privileged: true
+    networks:
+      - smarthome
+    ports:
+      - "8123:8123"
+    volumes:
+      - ha_config:/config
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=Asia/Bangkok
+    depends_on:
+      - mosquitto
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8123"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── Mosquitto MQTT Broker ───────────────────────────────
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:2.0
+    restart: unless-stopped
+    networks:
+      - smarthome
+    ports:
+      - "1883:1883"   # MQTT
+      - "9001:9001"   # WebSocket (for dashboard)
+    volumes:
+      - mosquitto_config:/mosquitto/config
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    environment:
+      - TZ=Asia/Bangkok
+    healthcheck:
+      test: ["CMD", "mosquitto_pub", "-h", "localhost", "-t", "health", "-m", "ok"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ─── Zigbee2MQTT ────────────────────────────────────────
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    image: koenkk/zigbee2mqtt:latest
+    restart: unless-stopped
+    networks:
+      - smarthome
+    ports:
+      - "8080:8080"   # Zigbee2MQTT Web UI
+    volumes:
+      - zigbee2mqtt_data:/app/data
+      - /run/udev:/run/udev:ro
+      # macOS: USB Zigbee dongle path — แก้ตาม device จริง
+      # ดู path: ls /dev/tty.usbserial-* หรือ ls /dev/tty.SLAB_USBtoUART
+    # devices:
+      # - /dev/tty.usbserial-0001:/dev/ttyACM0  # ⏳ เปิดเมื่อเสียบ Zigbee dongle แล้ว
+    environment:
+      - TZ=Asia/Bangkok
+    depends_on:
+      - mosquitto
+
+  # ─── n8n Workflow Automation ────────────────────────────
+  n8n:
+    container_name: n8n
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    networks:
+      - smarthome
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    environment:
+      - TZ=Asia/Bangkok
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      # Claude API Key — ใส่ค่าจริงใน .env
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      # LINE Channel Access Token
+      - LINE_CHANNEL_ACCESS_TOKEN=${LINE_CHANNEL_ACCESS_TOKEN}
+      # n8n encryption key
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-changeme_use_random_string}
+      # Basic auth (optional)
+      - N8N_BASIC_AUTH_ACTIVE=false
+    depends_on:
+      - mosquitto
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

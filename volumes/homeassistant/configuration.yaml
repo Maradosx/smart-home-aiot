@@ -1,0 +1,788 @@
+# ============================================================
+# Home Assistant — configuration.yaml
+# Smart Home AIoT Project  |  5 ESP32 boards  |  HA 2024+
+# ============================================================
+
+# ─── Core ────────────────────────────────────────────────────
+homeassistant:
+  name: "Smart Home AIoT"
+  latitude: 13.7563     # placeholder (Bangkok center) — set to your real home location
+  longitude: 100.5018   # placeholder (Bangkok center) — set to your real home location
+  elevation: 10
+  unit_system: metric
+  time_zone: Asia/Bangkok
+  currency: THB
+  country: TH
+
+# ─── Enabled Defaults ────────────────────────────────────────
+default_config:
+
+# ─── Emulated Hue (Alexa voice control) ─────────────────────
+emulated_hue:
+  host_ip: 0.0.0.0
+  listen_port: 80
+  expose_by_default: false
+  entities:
+    switch.bedroom_light:
+      name: "Bedroom Light"
+      hidden: false
+    switch.bedroom_fan:
+      name: "Bedroom Fan"
+      hidden: false
+    switch.kitchen_light:
+      name: "Kitchen Light"
+      hidden: false
+    switch.kitchen_fan:
+      name: "Kitchen Fan"
+      hidden: false
+    switch.bathroom_light:
+      name: "Bathroom Light"
+      hidden: false
+    switch.garden_light:
+      name: "Garden Light"
+      hidden: false
+    switch.garden_water_pump:
+      name: "Garden Pump"
+      hidden: false
+    switch.garage_light:
+      name: "Garage Light"
+      hidden: false
+    cover.bedroom_curtain:
+      name: "Bedroom Curtain"
+      hidden: false
+    cover.garage_door:
+      name: "Garage Door"
+      hidden: false
+
+# ─── HTTP / Lovelace ─────────────────────────────────────────
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.16.0.0/12
+    - 100.64.0.0/10    # Tailscale network
+    - 0.0.0.0/0        # ngrok / external reverse proxy
+
+lovelace:
+  mode: yaml
+  resources: []
+
+# ─── MQTT Entities (HA 2024+ format) ─────────────────────────
+# Broker ตั้งผ่าน UI: Settings → Integrations → MQTT
+# broker: 54.226.244.180 | port: 1883
+mqtt:
+
+  # ── Sensors ──────────────────────────────────────────────────
+  sensor:
+
+    # ── ESP32 #1 — ห้องนอน (Bedroom) ──────────────────────────
+    - name: "Bedroom Temperature"
+      state_topic: "home/bedroom/temperature"
+      unit_of_measurement: "°C"
+      device_class: temperature
+      unique_id: "sensor_bedroom_temp"
+
+    - name: "Bedroom Humidity"
+      state_topic: "home/bedroom/humidity"
+      unit_of_measurement: "%"
+      device_class: humidity
+      unique_id: "sensor_bedroom_hum"
+
+    - name: "Bedroom LDR"
+      state_topic: "home/bedroom/ldr"
+      unit_of_measurement: "ADC"
+      icon: mdi:brightness-6
+      unique_id: "sensor_bedroom_ldr"
+
+    # ── ESP32 #2 — ห้องนั่งเล่น (Living Room) ─────────────────
+    - name: "Living Room Temperature"
+      state_topic: "home/livingroom/temperature"
+      unit_of_measurement: "°C"
+      device_class: temperature
+      unique_id: "sensor_livingroom_temp"
+
+    - name: "Living Room Humidity"
+      state_topic: "home/livingroom/humidity"
+      unit_of_measurement: "%"
+      device_class: humidity
+      unique_id: "sensor_livingroom_hum"
+
+    - name: "Living Room Air Quality"
+      state_topic: "home/livingroom/air_quality"
+      unit_of_measurement: "ADC"
+      icon: mdi:air-filter
+      unique_id: "sensor_livingroom_air"
+
+    - name: "Living Room LDR"
+      state_topic: "home/livingroom/ldr"
+      unit_of_measurement: "ADC"
+      icon: mdi:brightness-6
+      unique_id: "sensor_livingroom_ldr"
+
+    # ── ESP32 #3 — ห้องครัว (Kitchen) ──────────────────────────
+    - name: "Kitchen Temperature"
+      state_topic: "home/kitchen/temperature"
+      unit_of_measurement: "°C"
+      device_class: temperature
+      unique_id: "sensor_kitchen_temp"
+
+    - name: "Kitchen Humidity"
+      state_topic: "home/kitchen/humidity"
+      unit_of_measurement: "%"
+      device_class: humidity
+      unique_id: "sensor_kitchen_hum"
+
+    - name: "Kitchen Gas LPG"
+      state_topic: "home/kitchen/gas_lpg"
+      unit_of_measurement: "ADC"
+      icon: mdi:gas-cylinder
+      unique_id: "sensor_kitchen_gas"
+
+    - name: "Kitchen LDR"
+      state_topic: "home/kitchen/ldr"
+      unit_of_measurement: "ADC"
+      icon: mdi:brightness-6
+      unique_id: "sensor_kitchen_ldr"
+
+    # ── ESP32 #4 — ห้องน้ำ + สวน (Bathroom + Garden) ──────────
+    - name: "Bathroom LDR"
+      state_topic: "home/bathroom/ldr"
+      unit_of_measurement: "ADC"
+      icon: mdi:brightness-6
+      unique_id: "sensor_bathroom_ldr"
+
+    - name: "Garden Soil Moisture"
+      state_topic: "home/garden/soil_moisture"
+      unit_of_measurement: "%"
+      icon: mdi:water-percent
+      unique_id: "sensor_garden_soil"
+
+    - name: "Garden Soil Raw"
+      state_topic: "home/garden/soil_raw"
+      unit_of_measurement: "ADC"
+      unique_id: "sensor_garden_soil_raw"
+
+    # ── ESP32 #5 — โรงรถ (Garage) ──────────────────────────────
+    - name: "Garage Smoke LPG"
+      state_topic: "home/garage/smoke_lpg"
+      unit_of_measurement: "ADC"
+      icon: mdi:smoke-detector
+      unique_id: "sensor_garage_smoke"
+
+    - name: "Garage LDR"
+      state_topic: "home/garage/ldr"
+      unit_of_measurement: "ADC"
+      icon: mdi:brightness-6
+      unique_id: "sensor_garage_ldr"
+
+  # ── Binary Sensors ───────────────────────────────────────────
+  binary_sensor:
+
+    # ── ESP32 #1 — ห้องนอน LD2410 mmWave + PIR ────────────────
+    - name: "Bedroom Presence"
+      state_topic: "home/bedroom/presence"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: occupancy
+      unique_id: "binary_bedroom_presence"
+
+    - name: "Bedroom Fall Alert"
+      state_topic: "home/bedroom/fall_alert"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: safety
+      unique_id: "binary_bedroom_fall"
+
+    - name: "Bedroom Motion"
+      state_topic: "home/bedroom/motion"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: motion
+      unique_id: "binary_bedroom_motion"
+
+    # ── ESP32 #2 — ห้องนั่งเล่น MQ-135 ────────────────────────
+    - name: "Living Room Air Alert"
+      state_topic: "home/livingroom/air_alert"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: gas
+      unique_id: "binary_livingroom_air_alert"
+
+    # ── Zigbee SNZB-03P — PIR ห้องนั่งเล่น ────────────────────
+    - name: "Living Room Motion"
+      state_topic: "zigbee2mqtt/livingroom_pir"
+      value_template: "{{ value_json.occupancy | lower }}"
+      payload_on: "true"
+      payload_off: "false"
+      device_class: motion
+      unique_id: "binary_livingroom_motion"
+
+    # ── ESP32 #3 — ห้องครัว MQ-2 ──────────────────────────────
+    - name: "Kitchen Gas Alert"
+      state_topic: "home/kitchen/gas_alert"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: gas
+      unique_id: "binary_kitchen_gas_alert"
+
+    # ── ESP32 #4 — ห้องน้ำ LD2410 mmWave ──────────────────────
+    - name: "Bathroom Presence"
+      state_topic: "home/bathroom/presence"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: occupancy
+      unique_id: "binary_bathroom_presence"
+
+    - name: "Bathroom Fall Alert"
+      state_topic: "home/bathroom/fall_alert"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: safety
+      unique_id: "binary_bathroom_fall"
+
+    # ── Zigbee SNZB-05 — Water Leak ห้องน้ำ ───────────────────
+    - name: "Bathroom Water Leak"
+      state_topic: "zigbee2mqtt/bathroom_water_leak"
+      value_template: "{{ value_json.water_leak | lower }}"
+      payload_on: "true"
+      payload_off: "false"
+      device_class: moisture
+      unique_id: "binary_bathroom_leak"
+
+    # ── Zigbee SNZB-04 — Door Sensor ทางเข้า ──────────────────
+    - name: "Front Door"
+      state_topic: "zigbee2mqtt/front_door_sensor"
+      value_template: "{{ value_json.contact | lower }}"
+      payload_on: "false"   # contact=false → ประตูเปิด
+      payload_off: "true"   # contact=true  → ประตูปิด
+      device_class: door
+      unique_id: "binary_front_door"
+
+    # ── ESP32 #5 — โรงรถ ───────────────────────────────────────
+    - name: "Garage Smoke Alert"
+      state_topic: "home/garage/smoke_alert"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: smoke
+      unique_id: "binary_garage_smoke_alert"
+
+    - name: "Garage Motion"
+      state_topic: "home/garage/motion"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: motion
+      unique_id: "binary_garage_motion"
+
+  # ── Switches ─────────────────────────────────────────────────
+  switch:
+
+    # ── ESP32 #1 — ห้องนอน ─────────────────────────────────────
+    - name: "Bedroom Light"
+      command_topic: "home/bedroom/light/set"
+      state_topic: "home/bedroom/light/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_bedroom_light"
+      icon: mdi:lightbulb
+
+    - name: "Bedroom Fan"
+      command_topic: "home/bedroom/fan/set"
+      state_topic: "home/bedroom/fan/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_bedroom_fan"
+      icon: mdi:fan
+
+    # ── ESP32 #3 — ห้องครัว ────────────────────────────────────
+    - name: "Kitchen Light"
+      command_topic: "home/kitchen/light/set"
+      state_topic: "home/kitchen/light/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_kitchen_light"
+      icon: mdi:lightbulb
+
+    - name: "Kitchen Fan"
+      command_topic: "home/kitchen/fan/set"
+      state_topic: "home/kitchen/fan/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_kitchen_fan"
+      icon: mdi:fan-clock
+
+    - name: "Kitchen Stove"
+      command_topic: "home/kitchen/stove/set"
+      state_topic: "home/kitchen/stove/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_kitchen_stove"
+      icon: mdi:stove
+
+    # ── ESP32 #4 — ห้องน้ำ ─────────────────────────────────────
+    - name: "Bathroom Light"
+      command_topic: "home/bathroom/light/set"
+      state_topic: "home/bathroom/light/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_bathroom_light"
+      icon: mdi:lightbulb
+
+    # ── ESP32 #4 — สวน ─────────────────────────────────────────
+    - name: "Garden Water Pump"
+      command_topic: "home/garden/pump/set"
+      state_topic: "home/garden/pump_state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_garden_pump"
+      icon: mdi:water-pump
+
+    - name: "Garden Light"
+      command_topic: "home/garden/light/set"
+      state_topic: "home/garden/light/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_garden_light"
+      icon: mdi:outdoor-lamp
+
+    - name: "Garden Pathway Light"
+      command_topic: "home/garden/pathway/set"
+      state_topic: "home/garden/pathway/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_garden_pathway"
+      icon: mdi:outdoor-lamp
+
+    # ── ESP32 #5 — โรงรถ ────────────────────────────────────────
+    - name: "Garage Light"
+      command_topic: "home/garage/light/set"
+      state_topic: "home/garage/light/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_garage_light"
+      icon: mdi:lightbulb
+
+    - name: "Garage Pathway Light"
+      command_topic: "home/garage/pathway/set"
+      state_topic: "home/garage/pathway/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: false
+      retain: true
+      unique_id: "switch_garage_pathway"
+      icon: mdi:outdoor-lamp
+
+  # ── Covers ───────────────────────────────────────────────────
+  cover:
+
+    # ── ESP32 #1 — ม่านห้องนอน (Servo SG90) ────────────────────
+    - name: "Bedroom Curtain"
+      command_topic: "home/bedroom/curtain/set"
+      state_topic: "home/bedroom/curtain/state"
+      payload_open: "OPEN"
+      payload_close: "CLOSE"
+      payload_stop: "STOP"
+      state_open: "OPEN"
+      state_closed: "CLOSED"
+      device_class: curtain
+      unique_id: "cover_bedroom_curtain"
+
+    # ── ESP32 #5 — ประตูโรงรถ (DC Motor H-bridge) ───────────────
+    - name: "Garage Door"
+      command_topic: "home/garage/door/set"
+      state_topic: "home/garage/door/state"
+      payload_open: "OPEN"
+      payload_close: "CLOSE"
+      payload_stop: "STOP"
+      state_open: "OPEN"
+      state_closed: "CLOSED"
+      state_opening: "OPENING"
+      state_closing: "CLOSING"
+      state_stopped: "STOPPED"
+      device_class: garage
+      unique_id: "cover_garage_door"
+
+# ─── Input Select (House / Comfort Mode) ─────────────────────
+input_select:
+  house_mode:
+    name: "House Mode"
+    options:
+      - Home
+      - Away
+      - Security
+    initial: Home
+    icon: mdi:home
+
+  comfort_mode:
+    name: "Comfort Mode"
+    options:
+      - Normal
+      - Relax
+      - Warm
+      - Sleep
+    initial: Normal
+    icon: mdi:sofa
+
+# ─── Automations ─────────────────────────────────────────────
+automation:
+
+  # ── Away Mode: ปิดอุปกรณ์ทุกตัวเมื่อออกจากบ้าน ──────────────
+  - alias: "Away Mode - Turn Off All Devices"
+    description: "เมื่อโหมดบ้านเปลี่ยนเป็น Away ให้ปิดอุปกรณ์ทั้งหมด"
+    trigger:
+      - platform: state
+        entity_id: input_select.house_mode
+        to: "Away"
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id:
+            - switch.bedroom_light
+            - switch.bedroom_fan
+            - switch.kitchen_light
+            - switch.kitchen_fan
+            - switch.kitchen_stove
+            - switch.bathroom_light
+            - switch.garden_water_pump
+            - switch.garden_light
+            - switch.garden_pathway_light
+            - switch.garage_light
+            - switch.garage_pathway_light
+            - switch.livingroom_fan_plug
+            - switch.livingroom_purifier_plug
+      - service: light.turn_off
+        target:
+          entity_id: light.livingroom_rgbw
+
+  # ── Security Mode: ปิดทุกอย่าง + ปิดประตูโรงรถ ──────────────
+  - alias: "Security Mode - Turn Off All Devices"
+    description: "เมื่อโหมดบ้านเปลี่ยนเป็น Security ให้ปิดอุปกรณ์ทั้งหมด + ปิดประตูโรงรถ"
+    trigger:
+      - platform: state
+        entity_id: input_select.house_mode
+        to: "Security"
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id:
+            - switch.bedroom_light
+            - switch.bedroom_fan
+            - switch.kitchen_light
+            - switch.kitchen_fan
+            - switch.kitchen_stove
+            - switch.bathroom_light
+            - switch.garden_water_pump
+            - switch.garden_light
+            - switch.garden_pathway_light
+            - switch.garage_light
+            - switch.garage_pathway_light
+            - switch.livingroom_fan_plug
+            - switch.livingroom_purifier_plug
+      - service: light.turn_off
+        target:
+          entity_id: light.livingroom_rgbw
+      - service: cover.close_cover
+        target:
+          entity_id: cover.garage_door
+
+  # ── Sleep Mode: ปิดไฟทุกดวง ──────────────────────────────────
+  - alias: "Sleep Mode - Turn Off All Lights"
+    description: "เมื่อ Comfort Mode เป็น Sleep ให้ปิดไฟทุกดวงและปิดม่าน"
+    trigger:
+      - platform: state
+        entity_id: input_select.comfort_mode
+        to: "Sleep"
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id:
+            - switch.bedroom_light
+            - switch.kitchen_light
+            - switch.bathroom_light
+            - switch.garden_light
+            - switch.garden_pathway_light
+            - switch.garage_light
+            - switch.livingroom_fan_plug
+            - switch.livingroom_purifier_plug
+      - service: light.turn_off
+        target:
+          entity_id: light.livingroom_rgbw
+      - service: cover.close_cover
+        target:
+          entity_id: cover.bedroom_curtain
+
+  # ── Gas Alert (ครัว): เปิดพัดลม + แจ้ง LINE ─────────────────
+  - alias: "Gas Alert - Auto Vent Fan ON"
+    description: "เมื่อตรวจพบแก๊สในครัว ให้เปิดพัดลม + แจ้ง LINE (cooldown 10 นาที)"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_gas_alert
+        to: "on"
+        for:
+          minutes: 1
+    action:
+      - service: switch.turn_on
+        target:
+          entity_id: switch.kitchen_fan
+      - service: rest_command.send_alert
+        data:
+          alert_type: "gas_alert"
+          value: "{{ states('sensor.kitchen_gas_lpg') }}"
+          room: "kitchen"
+      - delay:
+          minutes: 10
+
+  # ── Water Leak: แจ้ง LINE ────────────────────────────────────
+  - alias: "Water Leak - LINE Alert"
+    description: "เมื่อตรวจพบน้ำรั่ว แจ้ง LINE (cooldown 10 นาที)"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bathroom_water_leak
+        to: "on"
+        for:
+          minutes: 1
+    action:
+      - service: rest_command.send_alert
+        data:
+          alert_type: "water_leak"
+          value: "detected"
+          room: "bathroom"
+      - delay:
+          minutes: 10
+
+  # ── Bedroom Fall Alert: แจ้ง LINE ────────────────────────────
+  - alias: "Bedroom Fall Alert - LINE Alert"
+    description: "เมื่อ LD2410 ตรวจพบการล้มในห้องนอน แจ้ง LINE ทันที"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bedroom_fall_alert
+        to: "on"
+    action:
+      - service: rest_command.send_alert
+        data:
+          alert_type: "fall_alert"
+          value: "detected"
+          room: "bedroom"
+      - delay:
+          minutes: 5
+
+  # ── Bathroom Fall Alert: แจ้ง LINE ──────────────────────────
+  - alias: "Bathroom Fall Alert - LINE Alert"
+    description: "เมื่อ LD2410 ตรวจพบการล้มในห้องน้ำ แจ้ง LINE ทันที"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bathroom_fall_alert
+        to: "on"
+    action:
+      - service: rest_command.send_alert
+        data:
+          alert_type: "fall_alert"
+          value: "detected"
+          room: "bathroom"
+      - delay:
+          minutes: 5
+
+  # ── Garage Smoke Alert: แจ้ง LINE ────────────────────────────
+  - alias: "Garage Smoke Alert - LINE Alert"
+    description: "เมื่อตรวจพบควัน/แก๊สในโรงรถ แจ้ง LINE (ESP32 เปิดประตูอัตโนมัติแล้ว)"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.garage_smoke_alert
+        to: "on"
+        for:
+          minutes: 1
+    action:
+      - service: rest_command.send_alert
+        data:
+          alert_type: "smoke_alert"
+          value: "{{ states('sensor.garage_smoke_lpg') }}"
+          room: "garage"
+      - delay:
+          minutes: 10
+
+  # ── Soil Moisture ต่ำ: แจ้ง LINE ──────────────────────────────
+  - alias: "Soil Dry - LINE Alert"
+    description: "เมื่อความชื้นดินต่ำกว่า 30% แจ้ง LINE (cooldown 10 นาที)"
+    mode: single
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.garden_soil_moisture
+        below: 30
+    action:
+      - service: rest_command.send_alert
+        data:
+          alert_type: "soil_dry"
+          value: "{{ states('sensor.garden_soil_moisture') }}"
+          room: "garden"
+      - delay:
+          minutes: 10
+
+  # ── Front Door เปิดนานเกิน 10 นาที: แจ้ง LINE ─────────────────
+  - alias: "🚪 แจ้งเตือนประตูหน้าเปิดนานเกิน 10 นาที"
+    description: "แจ้ง LINE ถ้าประตูหน้าบ้านเปิดทิ้งไว้นานเกิน 10 นาที"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.front_door
+        to: "on"
+        for:
+          minutes: 10
+    condition:
+      - condition: state
+        entity_id: input_select.house_mode
+        state: "Home"
+    action:
+      - service: rest_command.send_alert
+        data:
+          alert_type: "door_open"
+          value: "10"
+          room: "frontdoor"
+
+  # ── Away Mode: แจ้ง LINE ─────────────────────────────────────
+  - alias: "Away Mode - LINE Notify"
+    description: "แจ้ง LINE เมื่อเข้า Away Mode"
+    trigger:
+      - platform: state
+        entity_id: input_select.house_mode
+        to: "Away"
+    action:
+      - delay: "00:00:03"
+      - service: rest_command.send_alert
+        data:
+          alert_type: "away_on"
+          value: "Away"
+          room: "all"
+
+  # ── ปิดไฟทุกห้อง 23:00 ────────────────────────────────────────
+  - alias: "🌙 ปิดไฟทุกห้อง 23:00"
+    description: "ปิดไฟทุกห้องอัตโนมัติทุกคืน 23:00"
+    trigger:
+      - platform: time
+        at: "23:00:00"
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id:
+            - switch.bedroom_light
+            - switch.kitchen_light
+            - switch.bathroom_light
+            - switch.garden_light
+            - switch.garden_pathway_light
+            - switch.garage_light
+            - switch.garage_pathway_light
+            - switch.livingroom_fan_plug
+            - switch.livingroom_purifier_plug
+      - service: light.turn_off
+        target:
+          entity_id: light.livingroom_rgbw
+      - service: rest_command.send_alert
+        data:
+          alert_type: "lights_off_night"
+          value: "23:00"
+          room: "all"
+
+  # ── รดน้ำอัตโนมัติ 07:00 ──────────────────────────────────────
+  - alias: "🌅 รดน้ำอัตโนมัติ 07:00"
+    description: "เปิดปั๊มน้ำ 07:00 นาน 10 นาที แล้วปิดเอง"
+    trigger:
+      - platform: time
+        at: "07:00:00"
+    action:
+      - service: switch.turn_on
+        target:
+          entity_id: switch.garden_water_pump
+      - delay: "00:10:00"
+      - service: switch.turn_off
+        target:
+          entity_id: switch.garden_water_pump
+      - service: rest_command.send_alert
+        data:
+          alert_type: "pump_done"
+          value: "10"
+          room: "garden"
+
+  # ── GPS Auto Away: ออกจากบ้าน → Away Mode ────────────────────
+  - alias: "📍 GPS - ออกจากบ้าน → Away Mode"
+    description: "เมื่อ GPS ตรวจจับว่าออกจาก Home Zone → เปลี่ยนเป็น Away Mode"
+    trigger:
+      - platform: state
+        entity_id: person.athit_boonpinit
+        to: "not_home"
+        for:
+          minutes: 2
+    condition:
+      - condition: state
+        entity_id: input_select.house_mode
+        state: "Home"
+    action:
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.house_mode
+        data:
+          option: "Away"
+      - service: rest_command.send_alert
+        data:
+          alert_type: "gps_away"
+          value: "not_home"
+          room: "all"
+
+  # ── GPS Auto Home: กลับบ้าน → Home Mode ──────────────────────
+  - alias: "🏠 GPS - กลับบ้าน → Home Mode"
+    description: "เมื่อ GPS ตรวจจับว่ากลับเข้า Home Zone → เปลี่ยนเป็น Home Mode"
+    trigger:
+      - platform: state
+        entity_id: person.athit_boonpinit
+        to: "home"
+    action:
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.house_mode
+        data:
+          option: "Home"
+      - service: rest_command.send_alert
+        data:
+          alert_type: "gps_home"
+          value: "home"
+          room: "all"
+
+# ─── REST Commands (เรียก n8n Alert) ─────────────────────────
+rest_command:
+  send_alert:
+    url: "https://YOUR_N8N_INSTANCE.up.railway.app/webhook/smart-home-alert"
+    method: POST
+    content_type: "application/json"
+    payload: '{"alert_type":"{{ alert_type }}","value":"{{ value }}","room":"{{ room }}"}'
+
+# ─── Recorder / History ──────────────────────────────────────
+recorder:
+  purge_keep_days: 30
+  include:
+    domains:
+      - switch
+      - sensor
+      - binary_sensor
+      - input_select
+      - automation
+      - cover
