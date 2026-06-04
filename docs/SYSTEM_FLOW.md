@@ -8,7 +8,7 @@
 > ⚠️ **POST-DEFENSE NOTE (27 พ.ค. 2569):**
 > Body ของไฟล์นี้สรุปสถาปัตยกรรมตอน 25 พ.ค. (pre-defense). 26 พ.ค. มี bug-fix sprint แก้ 12 จุด + เพิ่ม **24 automations ใหม่** + เปลี่ยน ChAvee LINE Bot จาก n8n เป็น **ngrok HTTPS bypass**
 >
-> **เลขปัจจุบัน:** 230 entities, 87 automations (86 ON), 7 scripts
+> **เลขปัจจุบัน:** 230 entities, 41 automations in HA UI (87 total incl. YAML + test/debug), 7 scripts
 >
 > **อ่านอัปเดตล่าสุด:**
 > - [`DEFENSE_HANDOFF/POST_DEFENSE_FINAL.md`](DEFENSE_HANDOFF/POST_DEFENSE_FINAL.md) — Full retrospective

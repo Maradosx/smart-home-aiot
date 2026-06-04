@@ -27,15 +27,15 @@
 | Metric | Value |
 |---|---|
 | **Hardware components** | 13 (5× ESP32 + Pi 3B+ + 6 Zigbee) |
-| **HA entities** | ~230 |
-| **HA automations** | **87** (86 active) |
+| **HA entities** | ~210 (230 incl. helpers) |
+| **HA automations** | **41** in HA UI (87 total incl. YAML + test/debug) |
 | **HA scripts** | 7 |
 | **Alexa Custom Intents** | 23 |
 | **MQTT topics** | 30+ |
 | **Test cases** | 130 (10 trials each) |
 | **Documentation files** | 30+ MD files |
 | **Lines of MASTER_REFERENCE** | 2,349 |
-| **Monthly running cost** | ~฿1,664–1,864 |
+| **Monthly running cost** | ~฿200–600 steady-state (~฿1,664–1,864 during public demo w/ LINE Basic) |
 | **End-to-end response** | ~1.7 sec (LINE) / ~1.5 sec (Alexa) |
 
 ---
@@ -105,18 +105,21 @@
 
 ```
 smart-home-aiot/
+├── 📖 README.md                 You are here
 ├── 📖 MASTER_REFERENCE.md       ⭐ Single source of truth (2,349 lines)
-├── PROJECT_STATE.md             Live state snapshot
-├── PROJECT_STATUS_REPORT.md     Formal status + cost breakdown
-├── PROJECT_PROGRESS.md          12-module progress tracker
-├── HOME_FLOW_FINAL.md           Architecture + flows
-├── SYSTEM_FLOW.md               490-line comprehensive walkthrough
-├── V4_FIX_LOG.md                Bug-fix journey (12 bugs + ngrok bypass)
-├── PROJECT_JOURNEY.md           Build history
-├── HARDWARE_GUIDE.md            Hardware reference
-├── WIRING_DETAILED.md           Wiring details + GPIO map
-├── THESIS_REPORT_FINAL.md       Thesis document
-├── RECOVERY.md                  Disaster recovery procedures
+│
+├── 📚 docs/                     Detailed documentation
+│   ├── SYSTEM_FLOW.md           490-line architecture walkthrough
+│   ├── HARDWARE_GUIDE.md        Hardware reference
+│   ├── WIRING_DETAILED.md       Wiring details + GPIO map
+│   ├── V4_FIX_LOG.md            Bug-fix journey (12 bugs + ngrok bypass)
+│   ├── RECOVERY.md              Disaster recovery procedures
+│   ├── THESIS_REPORT_FINAL.md   Thesis document
+│   ├── PROJECT_STATE.md         Live state snapshot
+│   ├── PROJECT_STATUS_REPORT.md Formal status + cost breakdown
+│   ├── PROJECT_PROGRESS.md      12-module progress tracker
+│   ├── PROJECT_JOURNEY.md       Build history
+│   └── HOME_FLOW_FINAL.md       Architecture + flows
 │
 ├── 🎓 DEFENSE_HANDOFF/          Defense bundle
 │   ├── POST_DEFENSE_FINAL.md    Comprehensive retrospective
@@ -227,12 +230,12 @@ cd alexa && zip -r lambda.zip lambda_function.py
 |---|---|
 | **[MASTER_REFERENCE.md](MASTER_REFERENCE.md)** ⭐ | The single source of truth — everything in one file |
 | [DEFENSE_HANDOFF/POST_DEFENSE_FINAL.md](DEFENSE_HANDOFF/POST_DEFENSE_FINAL.md) | Comprehensive 9-phase retrospective |
-| [PROJECT_STATE.md](PROJECT_STATE.md) | Live system snapshot |
-| [V4_FIX_LOG.md](V4_FIX_LOG.md) | 12 bugs + ngrok bypass story |
-| [SYSTEM_FLOW.md](SYSTEM_FLOW.md) | 490-line architecture walkthrough |
-| [HARDWARE_GUIDE.md](HARDWARE_GUIDE.md) | Hardware reference |
-| [RECOVERY.md](RECOVERY.md) | Disaster recovery procedures |
-| [THESIS_REPORT_FINAL.md](THESIS_REPORT_FINAL.md) | Full thesis document |
+| [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md) | Live system snapshot |
+| [docs/V4_FIX_LOG.md](docs/V4_FIX_LOG.md) | 12 bugs + ngrok bypass story |
+| [docs/SYSTEM_FLOW.md](docs/SYSTEM_FLOW.md) | 490-line architecture walkthrough |
+| [docs/HARDWARE_GUIDE.md](docs/HARDWARE_GUIDE.md) | Hardware reference |
+| [docs/RECOVERY.md](docs/RECOVERY.md) | Disaster recovery procedures |
+| [docs/THESIS_REPORT_FINAL.md](docs/THESIS_REPORT_FINAL.md) | Full thesis document |
 
 ---
 
@@ -264,7 +267,7 @@ cd alexa && zip -r lambda.zip lambda_function.py
 
 ## 📄 License
 
-Private project — not licensed for public use. Educational reference only.
+Personal academic / portfolio project. Source is public for **educational reference**. © 2026 Athit "Mos" Boonpinit — all rights reserved. Please credit if referenced, and ask before reusing in your own work.
 
 ---
 

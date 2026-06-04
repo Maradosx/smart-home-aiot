@@ -54,12 +54,12 @@
 |---|---|
 | Hardware components | **13** (5 ESP32 + 6 Zigbee + Pi + dongle) |
 | HA entities | **~230** |
-| HA automations | **87** (86 ON, 1 disabled) |
+| HA automations | **87** total — 41 in HA UI + YAML/test |
 | HA scripts | **7** |
 | n8n active workflows | **3** (daily report, alert, +ChAvee bypassed) |
 | Lambda intents | **23** (Alexa) |
 | Documentation files | **30+ MD files** |
-| Total cost/month | **฿1,664-1,864** |
+| Total cost/month | **~฿200-600** steady-state · **฿1,664-1,864** w/ LINE Basic (demo) |
 
 ---
 
@@ -866,7 +866,7 @@ USB stick ที่ทำหน้าที่ **Zigbee coordinator** — เป
 #### **ใช้ทำอะไรในโปรเจคนี้?**
 - **Run on EC2 (Docker)** at `YOUR_EC2_IP:8123`
 - **Centralize ทุก device + automation** — ESP32, Zigbee, Tuya, iOS, Alexa, LINE, Supabase, Met.no
-- **87 automations** ทำงานที่นี่ — Smart Light, Pump, Scene, Mode, Notify, Safety
+- **87 automations total** (41 in HA UI + YAML/test) ทำงานที่นี่ — Smart Light, Pump, Scene, Mode, Notify, Safety
 - **Dashboard** สำหรับ visualize + manual control
 - **Webhook + API** เปิดให้ Lambda + n8n + ngrok เข้าถึง
 
@@ -1444,7 +1444,7 @@ HA ──publishes "home/bedroom/light"────> Mosquitto ──forwards─
 ║   │  IP: YOUR_EC2_IP:8123                                     │       ║
 ║   │                                                            │       ║
 ║   │  • 230 entities                                            │       ║
-║   │  • 87 automations (86 ON)                                  │       ║
+║   │  • 87 total · 41 in HA UI                                  │       ║
 ║   │  • 7 scripts                                               │       ║
 ║   │  • 9 Lovelace views                                        │       ║
 ║   │  • Met.no + Supabase + Companion integrations              │       ║
@@ -1578,7 +1578,7 @@ Parallel:
 | `script.*` | 7 | scene scripts (smooth lighting) |
 | `notify.*` | 3 | mobile_app_maradosx, persistent_notification, send_alert (REST) |
 
-### 🤖 Automations (87 total — 86 ON)
+### 🤖 Automations (87 total — 41 in HA UI + YAML/test)
 
 See Section 11 for complete breakdown by category.
 
@@ -2062,7 +2062,7 @@ HA Automation (e.g., gas alert)
 | Met.no Weather | Free | ฿0 | $0 | Unlimited |
 | Z2M (Pi local) | N/A | ฿0 | $0 | Self-hosted |
 | ngrok | Free | ฿0 | $0 | Static URL on paid plan TBD |
-| **TOTAL** |  | **฿1,664-1,864** | **~$47-53** | Comfortable budget |
+| **TOTAL** |  | **฿1,664-1,864** | **~$47-53** | With LINE Basic; ~฿200-600 on LINE Free (steady-state) |
 
 ### 💸 One-time Hardware Cost (Approximate)
 
@@ -2290,7 +2290,7 @@ User direct quote: **"ผมไปสอบโปรเจคมาแล้ว 
 | Safety automations | ✅ | gas/water/fall/intrusion all live |
 | AI quality | ✅ | Claude Haiku 4.5 — multi-action, Thai/English |
 | Documentation | ✅ | 30+ MD files including this master ref |
-| Cost | ✅ | ~฿1,664-1,864/mo within budget |
+| Cost | ✅ | ~฿200-600/mo steady-state (฿1,664-1,864 w/ LINE Basic) — within budget |
 | Defense | ✅ | PASSED 26 พ.ค. 2569 |
 
 ### 🔮 Future Improvements (Optional)

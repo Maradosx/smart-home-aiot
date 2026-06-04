@@ -12,7 +12,7 @@
 |---|---|
 | HA Core | `2026.4.2` (Docker, no Supervisor) |
 | **Entities ทั้งหมด** | **~230** (+48 from 26 พ.ค. sprint: helpers, automations, scripts) |
-| **Automations** | **87 active** ⬆ (64 existing + 23 new + comfort_mode_light_scene) |
+| **Automations** | **41** in HA UI · **87 total** incl. YAML + test/debug (64 existing + 23 new + 1) |
 | Scripts | **7 storage + 17 yaml** |
 | Scenes | **8** (Default / Welcome / Sunrise / Calm / Bedtime / Party Loop / Alert Blink / STOP ALL) |
 | ESP32 firmwares | **5 zones** active |
@@ -52,7 +52,7 @@
 
 ## 🏠 Home Assistant (EC2 YOUR_EC2_IP:8123)
 
-### 87 Active Automations (categorized)
+### Automations (categorized) — 41 in HA UI, 87 total incl. YAML + test/debug
 
 #### 🆕 26 พ.ค. Bug Sprint (23 new):
 
