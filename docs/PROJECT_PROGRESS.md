@@ -8,7 +8,7 @@
 
 | Module | สถานะ | Detail |
 |---|:-:|---|
-| **1. HA Core** | ✅ | ~230 entities, **41 automations in HA UI (87 total incl. YAML + test/debug)**, 24 NEW from 26 พ.ค. sprint |
+| **1. HA Core** | ✅ | 235 entities, **71 automations (65 active)** — verified live 12 Jun 2026 |
 | **2. ESP32 × 5 zones** | ✅ | All publishing MQTT (bedroom/living/kitchen/bathroom-garden/garage) |
 | **3. Zigbee2MQTT** | ✅ | 6 devices paired on Pi (Tuya bulb + plugs + sensors) |
 | **4. n8n workflows** | ✅ | 2 active (daily report + HA alert) — ChAvee main bypassed via ngrok |

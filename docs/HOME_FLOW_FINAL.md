@@ -2,7 +2,7 @@
 
 > **Snapshot:** 26 พ.ค. 2569 evening (POST-DEFENSE)
 > **Status:** ✅ **DEFENSE PASSED — Production-ready 🎓**
-> **Live state:** ~230 entities, **41 automations in HA UI (87 total incl. YAML + test/debug, +24 from 26 พ.ค. sprint)**, GPS zone 4m at user location
+> **Live state:** 235 entities, **71 automations (65 active) — verified live 12 Jun 2026**, GPS zone 4m at user location
 > **AI:** Lambda EXPERT mode (new HOME_CONTEXT 16KB) + ChAvee LINE via ngrok HTTPS bypass = FULL control + chat + AI reasoning
 > **3-channel notifications:** Mobile Push + Persistent + LINE (Basic ฿1,284/mo)
 

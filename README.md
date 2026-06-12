@@ -27,8 +27,8 @@
 | Metric | Value |
 |---|---|
 | **Hardware components** | 13 (5× ESP32 + Pi 3B+ + 6 Zigbee) |
-| **HA entities** | ~210 (230 incl. helpers) |
-| **HA automations** | **41** in HA UI (87 total incl. YAML + test/debug) |
+| **HA entities** | **235** (verified live 12 Jun 2026) |
+| **HA automations** | **71** (65 active) — UI-managed + YAML packages |
 | **HA scripts** | 7 |
 | **Alexa Custom Intents** | 23 |
 | **MQTT topics** | 30+ |

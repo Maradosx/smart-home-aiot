@@ -47,7 +47,7 @@
 - ✅ EC2 t3.small running HA + Mosquitto + Supabase mirror (Docker)
 
 ### Software (Cloud)
-- ✅ Home Assistant 2026.4.2 — **210 entities, 41 automations (40 ON), 7 scripts** (audit + cleanup 51→41; 87 total counting YAML + test/debug automations)
+- ✅ Home Assistant 2026.4.2 — **235 entities, 71 automations (65 ON), 7 scripts** (verified live 12 Jun 2026 — defense-day audit 51→41 UI, ปัจจุบันรวม YAML packages + sprint = 71)
 - ✅ n8n on Railway — 3 active workflows (ชาวี + Daily Report + HA Alert)
 - ✅ Supabase — chat_logs + mode_changes for analytics
 - ✅ AWS Lambda — smart-home-alexa (us-east-1) with comprehensive HOME_CONTEXT

@@ -11,8 +11,8 @@
 | หัวข้อ | สถานะ |
 |---|---|
 | HA Core | `2026.4.2` (Docker, no Supervisor) |
-| **Entities ทั้งหมด** | **~230** (+48 from 26 พ.ค. sprint: helpers, automations, scripts) |
-| **Automations** | **41** in HA UI · **87 total** incl. YAML + test/debug (64 existing + 23 new + 1) |
+| **Entities ทั้งหมด** | **235** — verified live 12 Jun 2026 (+48 from 26 พ.ค. sprint: helpers, automations, scripts) |
+| **Automations** | **71** (65 active) — verified live 12 Jun 2026 via HA API |
 | Scripts | **7 storage + 17 yaml** |
 | Scenes | **8** (Default / Welcome / Sunrise / Calm / Bedtime / Party Loop / Alert Blink / STOP ALL) |
 | ESP32 firmwares | **5 zones** active |
@@ -52,7 +52,7 @@
 
 ## 🏠 Home Assistant (EC2 YOUR_EC2_IP:8123)
 
-### Automations (categorized) — 41 in HA UI, 87 total incl. YAML + test/debug
+### Automations (categorized) — 71 total (65 active), verified live 12 Jun 2026
 
 #### 🆕 26 พ.ค. Bug Sprint (23 new):
 

@@ -53,8 +53,8 @@
 | Metric | Value |
 |---|---|
 | Hardware components | **13** (5 ESP32 + 6 Zigbee + Pi + dongle) |
-| HA entities | **~230** |
-| HA automations | **87** total — 41 in HA UI + YAML/test |
+| HA entities | **235** (live 12 Jun 2026) |
+| HA automations | **71** (65 active) — live 12 Jun 2026 |
 | HA scripts | **7** |
 | n8n active workflows | **3** (daily report, alert, +ChAvee bypassed) |
 | Lambda intents | **23** (Alexa) |
@@ -866,7 +866,7 @@ USB stick ที่ทำหน้าที่ **Zigbee coordinator** — เป
 #### **ใช้ทำอะไรในโปรเจคนี้?**
 - **Run on EC2 (Docker)** at `YOUR_EC2_IP:8123`
 - **Centralize ทุก device + automation** — ESP32, Zigbee, Tuya, iOS, Alexa, LINE, Supabase, Met.no
-- **87 automations total** (41 in HA UI + YAML/test) ทำงานที่นี่ — Smart Light, Pump, Scene, Mode, Notify, Safety
+- **71 automations** (65 active — verified live 12 Jun 2026) ทำงานที่นี่ — Smart Light, Pump, Scene, Mode, Notify, Safety
 - **Dashboard** สำหรับ visualize + manual control
 - **Webhook + API** เปิดให้ Lambda + n8n + ngrok เข้าถึง
 
@@ -1443,8 +1443,8 @@ HA ──publishes "home/bedroom/light"────> Mosquitto ──forwards─
 ║   │  HOME ASSISTANT CORE 2026.4.2  (Docker)                  │       ║
 ║   │  IP: YOUR_EC2_IP:8123                                     │       ║
 ║   │                                                            │       ║
-║   │  • 230 entities                                            │       ║
-║   │  • 87 total · 41 in HA UI                                  │       ║
+║   │  • 235 entities                                            │       ║
+║   │  • 71 automations (65 on)                                  │       ║
 ║   │  • 7 scripts                                               │       ║
 ║   │  • 9 Lovelace views                                        │       ║
 ║   │  • Met.no + Supabase + Companion integrations              │       ║
@@ -1558,7 +1558,7 @@ Parallel:
 
 ## 7. Home Assistant System (Detail)
 
-### 🧱 Entities Breakdown (~230 total)
+### 🧱 Entities Breakdown (235 total — verified live 12 Jun 2026)
 
 | Category | Count | Examples |
 |---|---|---|
@@ -1574,11 +1574,11 @@ Parallel:
 | `input_select.*` | 2 | house_mode (Home/Away/Security), comfort_mode (Normal/Warm/Sleep/Relax) |
 | `input_boolean.*` | ~10 | party_loop_active, alert_flash_active, *_light_manual_override |
 | `input_button.*` | 5 | scene_default/welcome/sunrise/calm/bedtime |
-| `automation.*` | 87 | (see Section 11) |
+| `automation.*` | 71 | 65 active — live 12 Jun 2026 (Section 11 = snapshot 87 ณ วันสอบ) |
 | `script.*` | 7 | scene scripts (smooth lighting) |
 | `notify.*` | 3 | mobile_app_maradosx, persistent_notification, send_alert (REST) |
 
-### 🤖 Automations (87 total — 41 in HA UI + YAML/test)
+### 🤖 Automations (71 total — 65 active · verified live 12 Jun 2026)
 
 See Section 11 for complete breakdown by category.
 
@@ -1844,6 +1844,8 @@ Includes:
 ---
 
 ## 11. Automations (87 รายการ) แยกหมวด
+
+> 📌 รายการด้านล่างคือ snapshot วันสอบ (87 รายการ รวม test/debug) — เลข **live ปัจจุบัน = 71 (65 active)** verified ผ่าน HA API 12 Jun 2026 หลัง cleanup automations ที่ซ้ำ/ทดสอบออก
 
 ### 💡 Smart Light (8 — per-room PIR + LDR)
 - `{bedroom,living_room,bathroom,garage}_smart_light_auto_on`
