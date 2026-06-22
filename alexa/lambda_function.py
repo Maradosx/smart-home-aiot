@@ -377,13 +377,30 @@ def get_home_state_brief():
         return f"[TIME: {time_str} Bangkok] " + " | ".join(ctx)
     except: return ""
 
-def ask_chavee(message, timeout=10):
-    """Send message to ชาวี via n8n LINE webhook + poll Supabase for reply.
-    Wraps message with HOME_CONTEXT + English-reply instruction."""
+def ask_chavee(message, timeout=12):
+    """Send message to ชาวี via HA webhook, then POLL Supabase for the NEW reply.
+    Returns as soon as a chat_logs row newer than baseline appears (fits Alexa's ~8s
+    client budget, instead of a fixed long sleep that overran it)."""
     reply_token = f"alexa_{uuid.uuid4().hex[:16]}"
     state_brief = get_home_state_brief()
-    # Wrap message with full context
     wrapped = f"{HOME_CONTEXT}\n\nCURRENT STATE: {state_brief}\n\nALEXA USER SAID: {message}"
+    sup_q = (f"{SUPA_URL}/rest/v1/chat_logs"
+             f"?user_id=eq.{ALEXA_USER}&order=id.desc&limit=1&select=id,reply")
+
+    def _latest():
+        try:
+            r = urllib.request.Request(sup_q, method="GET")
+            r.add_header("apikey", SUPA_KEY)
+            r.add_header("Authorization", f"Bearer {SUPA_KEY}")
+            with urllib.request.urlopen(r, timeout=4) as resp:
+                d = json.loads(resp.read())
+            return (d[0]["id"], d[0].get("reply", "OK")) if d else (0, None)
+        except Exception as e:
+            print(f"[supabase read] {e}")
+            return (0, None)
+
+    baseline_id, _ = _latest()
+
     payload = {
         "events": [{
             "type": "message",
@@ -393,33 +410,22 @@ def ask_chavee(message, timeout=10):
             "message": {"type": "text", "id": uuid.uuid4().hex, "text": wrapped}
         }]
     }
-    # Fire-and-forget to n8n
     try:
         req = urllib.request.Request(N8N_WEBHOOK,
             data=json.dumps(payload).encode(),
             headers={"Content-Type": "application/json"},
             method="POST")
-        urllib.request.urlopen(req, timeout=3).read()
+        urllib.request.urlopen(req, timeout=4).read()
     except Exception as e:
-        print(f"[n8n error] {e}")
+        print(f"[webhook error] {e}")
         return None
 
-    # Wait for ชาวี to process + Save Chat Log
-    time.sleep(timeout - 2)  # wait so chat_log row is saved
-
-    # Read latest reply from Supabase
-    try:
-        sup_url = (f"{SUPA_URL}/rest/v1/chat_logs"
-                   f"?user_id=eq.{ALEXA_USER}&limit=1&order=created_at.desc")
-        req = urllib.request.Request(sup_url, method="GET")
-        req.add_header("apikey", SUPA_KEY)
-        req.add_header("Authorization", f"Bearer {SUPA_KEY}")
-        with urllib.request.urlopen(req, timeout=5) as r:
-            data = json.loads(r.read())
-        if data and isinstance(data, list):
-            return data[0].get("reply", "OK")
-    except Exception as e:
-        print(f"[supabase error] {e}")
+    # poll for the NEW reply (id greater than baseline) — return ASAP
+    for _ in range(int(timeout)):
+        time.sleep(1)
+        rid, reply = _latest()
+        if rid > baseline_id and reply:
+            return reply
     return None
 
 # ═══ Intent Handlers ═════════════════════════════════════════

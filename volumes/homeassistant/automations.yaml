@@ -1,362 +1,1804 @@
-# ============================================================
-# Home Assistant — automations.yaml
-# Smart Home AIoT — Automation Rules
-# ============================================================
-
-# ─── [1] TEMPERATURE CONTROL ─────────────────────────────────
-- id: "auto_fan_temperature"
-  alias: "Auto Fan — Temperature > 30°C"
-  description: "เปิดพัดลมอัตโนมัติเมื่ออุณหภูมิสูงเกิน 30°C"
+- id: auto_fan_temperature
+  alias: Auto Fan — Temperature > 30°C
+  description: เปิดพัดลมอัตโนมัติเมื่ออุณหภูมิสูงเกิน 30°C
   trigger:
-    - platform: numeric_state
-      entity_id: sensor.living_room_temperature
-      above: 30
+  - platform: numeric_state
+    entity_id: sensor.living_room_temperature
+    above: 30
   condition:
-    - condition: state
-      entity_id: input_select.house_mode
-      state: "Home"
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Home
   action:
-    - service: switch.turn_on
-      target:
-        entity_id:
-          - switch.living_room_fan
-          - switch.bedroom_fan
-    - service: rest_command.send_alert
-      data:
-        alert_type: "temp_high"
-        value: "{{ states('sensor.living_room_temperature') }}"
-        room: "living_room"
-
-# ─── [2] MOTION LIGHT ────────────────────────────────────────
-- id: "auto_light_motion_night"
-  alias: "Motion Light — Night Only"
-  description: "เปิดไฟเมื่อตรวจพบการเคลื่อนไหวช่วงกลางคืน"
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.living_room_fan
+  - service: rest_command.send_alert
+    data:
+      alert_type: temp_high
+      value: '{{ states(''sensor.living_room_temperature'') }}'
+      room: living_room
+- id: auto_fan_off_cool
+  alias: "\U0001F4A8 Auto Fan OFF — Living Room < 28\xB0C (hysteresis)"
+  description: "\u0E2D\u0E38\u0E13\u0E2B\u0E20\u0E39\u0E21\u0E34 < 28\xB0C \u2192 \u0E1B\u0E34\u0E14\u0E1E\u0E31\u0E14\u0E25\u0E21 (\u0E04\u0E39\u0E48 on>30)"
   trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
+  - platform: numeric_state
+    entity_id: sensor.living_room_temperature
+    below: 28
   condition:
-    - condition: time
-      after: "20:00:00"
-      before: "06:00:00"
-    - condition: state
-      entity_id: input_select.house_mode
-      state: "Home"
+  - condition: state
+    entity_id: switch.living_room_fan
+    state: 'on'
   action:
-    - service: switch.turn_on
-      target:
-        entity_id: switch.living_room_light
-    - service: rest_command.send_alert
-      data:
-        alert_type: "motion_light"
-        value: "on"
-        room: "living_room"
-    - delay:
-        minutes: 5
-    - condition: state
-      entity_id: binary_sensor.living_room_motion
-      state: "off"
-    - service: switch.turn_off
-      target:
-        entity_id: switch.living_room_light
-
-# ─── [3] GAS ALERT ───────────────────────────────────────────
-- id: "auto_gas_alert"
-  alias: "Gas Alert — Emergency Response"
-  description: "เปิดพัดลมครัวทันทีเมื่อตรวจพบแก๊ส"
+  - service: switch.turn_off
+    target:
+      entity_id: switch.living_room_fan
   mode: single
+- id: auto_garden_light_on
+  alias: Garden Light ON — 18:00
   trigger:
-    - platform: state
-      entity_id: binary_sensor.kitchen_gas_alert
-      to: "on"
-      for:
-        minutes: 1
+  - platform: time
+    at: '18:00:00'
   action:
-    - service: switch.turn_on
-      target:
-        entity_id: switch.kitchen_vent_fan
-    - service: rest_command.send_alert
-      data:
-        alert_type: "gas_alert"
-        value: "{{ states('sensor.kitchen_gas_sensor') }}"
-        room: "kitchen"
-    - delay:
-        minutes: 10
-
-# ─── [4] WATER LEAK ALERT ────────────────────────────────────
-- id: "auto_water_leak_alert"
-  alias: "Water Leak Alert"
-  description: "แจ้งเตือนเมื่อตรวจพบน้ำรั่ว"
-  mode: single
+  - service: switch.turn_on
+    target:
+      entity_id: switch.garden_lights
+  - service: rest_command.send_alert
+    data:
+      alert_type: garden_light_on
+      value: '18:00'
+      room: garden
+- id: auto_garden_light_off
+  alias: Garden Light OFF — 23:00
   trigger:
-    - platform: state
-      entity_id: binary_sensor.bathroom_water_leak
-      to: "on"
-      for:
-        minutes: 1
+  - platform: time
+    at: '23:00:00'
   action:
-    - service: rest_command.send_alert
-      data:
-        alert_type: "water_leak"
-        value: "detected"
-        room: "bathroom"
-    - delay:
-        minutes: 10
-
-# ─── [5] AWAY MODE ───────────────────────────────────────────
-- id: "auto_away_mode_action"
-  alias: "Away Mode — Turn Off All"
-  description: "ปิดอุปกรณ์ทั้งหมดเมื่อเปิด Away Mode"
+  - service: switch.turn_off
+    target:
+      entity_id: switch.garden_lights
+- id: alert_door_unlocked_too_long
+  alias: "\U0001F6AA แจ้งเตือนประตูไม่ล็อกนานเกิน 10 นาที"
+  description: ถ้าประตูหน้าบ้านไม่ได้ล็อกนานเกิน 10 นาที ให้แจ้ง LINE
   trigger:
-    - platform: state
-      entity_id: input_select.house_mode
-      to: "Away"
-  action:
-    - service: switch.turn_off
-      target:
-        entity_id:
-          - switch.living_room_light
-          - switch.living_room_fan
-          - switch.bedroom_light
-          - switch.bedroom_fan
-          - switch.kitchen_vent_fan
-    - service: switch.turn_on
-      target:
-        entity_id: switch.front_door_lock
-    - delay: "00:00:03"
-    - service: rest_command.send_alert
-      data:
-        alert_type: "away_on"
-        value: "Away"
-        room: "all"
-
-# ─── [6] SECURITY MODE ───────────────────────────────────────
-- id: "auto_security_door_alert"
-  alias: "Security Mode — Door Open Alert"
-  description: "แจ้งเตือนเมื่อประตูเปิดในโหมด Security"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.front_door
-      to: "on"
+  - platform: state
+    entity_id: lock.front_door_lock
+    to: 'unlocked'
+    for:
+      minutes: 10
   condition:
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Home
+  action:
+  - service: rest_command.send_alert
+    data:
+      alert_type: door_open
+      value: '10'
+      room: frontdoor
+- id: v2_adaptive_bedroom_light
+  alias: "\U0001F4A1 Bedroom Adaptive Light - Motion + LDR"
+  description: เปิดไฟห้องนอนเมื่อมีคน + มืดพอ
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bedroom_presence
+    to: 'on'
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.bedroom_ldr
+    above: 2200
+  - condition: state
+    entity_id: switch.bedroom_light
+    state: 'off'
+  - condition: not
+    conditions:
     - condition: state
       entity_id: input_select.house_mode
-      state: "Security"
-  action:
-    - service: rest_command.send_alert
-      data:
-        alert_type: "security_door"
-        value: "{{ now().strftime('%H:%M') }}"
-        room: "frontdoor"
-
-# ─── [7] SLEEP MODE ──────────────────────────────────────────
-- id: "auto_sleep_mode"
-  alias: "Sleep Mode — Reduce Comfort"
-  description: "ปิดไฟหลัก เมื่อเปิด Sleep Mode"
-  trigger:
-    - platform: state
+      state: Away
+    - condition: state
       entity_id: input_select.comfort_mode
-      to: "Sleep"
-  action:
-    - service: switch.turn_off
-      target:
-        entity_id:
-          - switch.living_room_light
-          - switch.bedroom_light
-    - service: rest_command.send_alert
+      state: Sleep
+  actions:
+  - target:
+      entity_id: switch.bedroom_light
+    action: switch.turn_on
+- id: v2_adaptive_livingroom_light
+  alias: "\U0001F4A1 Living Room Adaptive Light - Motion + LDR"
+  description: เปิด Tuya bulb เมื่อมีคน + brightness ตาม LDR
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.living_room_motion
+    to: 'on'
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.living_room_ldr
+    above: 2200
+  - condition: state
+    entity_id: light.living_room_light
+    state: 'off'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Away
+    - condition: state
+      entity_id: input_select.comfort_mode
+      state: Sleep
+  actions:
+  - target:
+      entity_id: light.living_room_light
+    data:
+      brightness: '{% set ldr = states(''sensor.living_room_ldr'') | float(2200) %}{{
+        ((ldr - 2200) / 1300 * 200 + 55) | int | min(255) | max(80) }}'
+      color_temp_kelvin: 3500
+    action: light.turn_on
+- id: v2_adaptive_bathroom_light
+  alias: "\U0001F4A1 Bathroom Adaptive Light - Presence + LDR"
+  description: เปิดไฟห้องน้ำเมื่อมีคน + มืด
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bathroom_presence
+    to: 'on'
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.bathroom_ldr
+    above: 2000
+  - condition: state
+    entity_id: switch.bathroom_light
+    state: 'off'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Away
+  actions:
+  - target:
+      entity_id: switch.bathroom_light
+    action: switch.turn_on
+- id: v2_adaptive_garage_light
+  alias: "\U0001F4A1 Garage Adaptive Light - Motion + LDR"
+  description: เปิดไฟโรงรถ + ทางเดิน เมื่อมีคน + มืด
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.garage_motion
+    to: 'on'
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.garage_ldr
+    above: 2400
+  actions:
+  - target:
+      entity_id:
+      - switch.garage_light
+      - switch.garage_pathway_light
+    action: switch.turn_on
+- id: v2_autooff_garage
+  alias: "\U0001F305 Auto-Off Garage Lights (no motion 5min)"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.garage_motion
+    to: 'off'
+    for: 00:05:00
+  actions:
+  - target:
+      entity_id:
+      - switch.garage_light
+      - switch.garage_pathway_light
+    action: switch.turn_off
+- id: v2_autooff_bathroom
+  alias: "\U0001F305 Auto-Off Bathroom Light (no presence 5min)"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bathroom_presence
+    to: 'off'
+    for: 00:05:00
+  conditions:
+  - condition: state
+    entity_id: switch.bathroom_light
+    state: 'on'
+  actions:
+  - target:
+      entity_id: switch.bathroom_light
+    action: switch.turn_off
+- id: v2_sleep_path_light
+  alias: "\U0001F319 Sleep Path Light - Bedroom Motion → Living Dim"
+  description: 'Sleep mode: PIR ห้องนอน → Tuya bulb dim warm 10% 2 นาที'
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bedroom_presence
+    to: 'on'
+  conditions:
+  - condition: state
+    entity_id: input_select.comfort_mode
+    state: Sleep
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Home
+  actions:
+  - target:
+      entity_id: light.living_room_light
+    data:
+      brightness: 25
+      color_temp_kelvin: 2200
+    action: light.turn_on
+  - delay: 00:02:00
+  - target:
+      entity_id: light.living_room_light
+    action: light.turn_off
+- id: v2_gps_welcome_adaptive
+  alias: "\U0001F3E0 GPS Welcome Home - Adaptive Outdoor Lights + Garage"
+  description: GPS ตรวจจับถึงบ้าน → garage + ไฟภายนอกตาม LDR
+  triggers:
+  - platform: state
+    entity_id: person.athit_boonpinit
+    from: not_home
+    to: home
+    for: "00:00:30"
+  conditions:
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Away
+  actions:
+  - target:
+      entity_id: cover.garage_door
+    action: cover.open_cover
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.garage_ldr
+        above: 2400
+      sequence:
+      - target:
+          entity_id:
+          - switch.garage_light
+          - switch.garage_pathway_light
+        action: switch.turn_on
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.garden_ldr
+        above: 2200
+      sequence:
+      - target:
+          entity_id:
+          - switch.garden_lights
+        action: switch.turn_on
+  - target:
+      entity_id: input_select.house_mode
+    data:
+      option: Home
+    action: input_select.select_option
+  - data:
+      alert_type: welcome_home
+      value: ยินดีต้อนรับกลับบ้าน — เปิดโรงรถและไฟภายนอกตามแสงให้แล้ว
+      room: home
+    action: rest_command.send_alert
+- id: v2_relax_auto_fan
+  alias: "\U0001F6CB Relax Mode - Auto Fan if Hot"
+  description: Relax mode + ห้องร้อน → เปิดพัดลม + Tuya warm
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.living_room_temperature
+    above: 28
+  conditions:
+  - condition: state
+    entity_id: input_select.comfort_mode
+    state: Relax
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Home
+  - condition: state
+    entity_id: switch.living_room_fan
+    state: 'off'
+  actions:
+  - target:
+      entity_id: switch.living_room_fan
+    action: switch.turn_on
+  - target:
+      entity_id: light.living_room_light
+    data:
+      brightness: 153
+      color_temp_kelvin: 2700
+    action: light.turn_on
+- id: v2_gps_goodbye
+  alias: "\U0001F6AA GPS Goodbye - Auto Away after 2min grace"
+  description: ออกจากบ้าน 2 นาที → set Away mode
+  triggers:
+  - platform: state
+    entity_id: person.athit_boonpinit
+    from: home
+    to: not_home
+    for: 00:02:00
+  conditions:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Away
+  actions:
+  - target:
+      entity_id: input_select.house_mode
+    data:
+      option: Away
+    action: input_select.select_option
+  - data:
+      alert_type: goodbye
+      value: ออกจากบ้านเกิน 2 นาที — ตั้ง Away mode ให้อัตโนมัติ
+      room: home
+    action: rest_command.send_alert
+- id: v2_stove_warning
+  alias: "\U0001F525 Stove Safety - Warning if abandoned 10min"
+  description: เตาเปิด 10 นาที + คนอยู่ห้องอื่น → LINE warning
+  triggers:
+  - platform: state
+    entity_id: switch.kitchen_stove
+    to: 'on'
+    for: 00:10:00
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.bedroom_presence
+    state: 'on'
+  actions:
+  - data:
+      alert_type: stove_abandoned
+      value: ⚠️ เตาเปิดทิ้งไว้ 10 นาทีแล้ว!
+      room: kitchen
+    action: rest_command.send_alert
+- id: v2_stove_autooff
+  alias: "\U0001F525 Stove Safety - Auto-OFF if abandoned 15min"
+  description: เตาเปิด 15 นาที + Away mode → auto-off
+  triggers:
+  - platform: state
+    entity_id: switch.kitchen_stove
+    to: 'on'
+    for: 00:15:00
+  conditions:
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Away
+  actions:
+  - target:
+      entity_id: switch.kitchen_stove
+    action: switch.turn_off
+  - data:
+      alert_type: stove_auto_off
+      value: "\U0001F6D1 เตาเปิดทิ้งไว้ตอนไม่อยู่บ้าน — ปิดให้แล้ว"
+      room: kitchen
+    action: rest_command.send_alert
+- id: v2_curtain_sunset_close
+  alias: "\U0001F305 Bedroom Curtain - Auto Close at Sunset"
+  description: พระอาทิตย์ตก + Home → ปิดม่านห้องนอน
+  triggers:
+  - platform: state
+    entity_id: sun.sun
+    to: below_horizon
+  conditions:
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Home
+  - condition: state
+    entity_id: cover.bedroom_curtain
+    state: open
+  actions:
+  - target:
+      entity_id: cover.bedroom_curtain
+    action: cover.close_cover
+  - data:
+      alert_type: curtain_sunset
+      value: "\U0001F305 พระอาทิตย์ตก — ปิดม่านห้องนอนให้"
+      room: bedroom
+    action: rest_command.send_alert
+- id: v2_curtain_sunrise_open
+  alias: "\U0001F31E Bedroom Curtain - Auto Open after Sunrise +30min"
+  description: หลังพระอาทิตย์ขึ้น 30 นาที → เปิดม่าน (ถ้าไม่ใช่ Sleep)
+  triggers:
+  - platform: sun
+    event: sunrise
+    offset: +00:30:00
+  conditions:
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Home
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: input_select.comfort_mode
+      state: Sleep
+  - condition: state
+    entity_id: cover.bedroom_curtain
+    state: closed
+  actions:
+  - target:
+      entity_id: cover.bedroom_curtain
+    action: cover.open_cover
+- id: v2_sleep_fan_on
+  alias: "\U0001F4A8 Sleep Mode - Bedroom Auto-Fan if Hot"
+  description: Sleep + ห้องนอน >27°C → เปิดพัดลม
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.bedroom_temperature
+    above: 27
+  conditions:
+  - condition: state
+    entity_id: input_select.comfort_mode
+    state: Sleep
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Home
+  - condition: state
+    entity_id: switch.bedroom_fan
+    state: 'off'
+  actions:
+  - target:
+      entity_id: switch.bedroom_fan
+    action: switch.turn_on
+- id: v2_sleep_fan_off
+  alias: "\U0001F4A8 Sleep Mode - Bedroom Auto-Fan OFF when cool"
+  description: Sleep + ห้องนอน <25°C → ปิดพัดลม
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.bedroom_temperature
+    below: 25
+  conditions:
+  - condition: state
+    entity_id: input_select.comfort_mode
+    state: Sleep
+  - condition: state
+    entity_id: switch.bedroom_fan
+    state: 'on'
+  actions:
+  - target:
+      entity_id: switch.bedroom_fan
+    action: switch.turn_off
+- id: mobile_house_mode_change
+  alias: "\U0001F4F1 [Mobile+LINE] House Mode Change"
+  triggers:
+  - platform: state
+    entity_id: input_select.house_mode
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state.state != trigger.to_state.state }}'
+  actions:
+  - data:
+      title: "\U0001F3E0 โหมดบ้านเปลี่ยน"
+      message: "{{ trigger.from_state.state }} → {{ trigger.to_state.state }}\n{%
+        if trigger.to_state.state == 'Away' %}\U0001F512 ปิดอุปกรณ์ + ล็อคประตู{%
+        elif trigger.to_state.state == 'Security' %}\U0001F6E1️ ระบบความปลอดภัยเปิด{%
+        elif trigger.to_state.state == 'Home' %}✅ พร้อมใช้งาน{% endif %}"
       data:
-        alert_type: "sleep_mode"
-        value: "Sleep"
-        room: "all"
-
-# ─── [8] GARDEN PUMP AUTO ────────────────────────────────────
-- id: "auto_garden_pump"
-  alias: "Garden Pump — Soil Moisture < 40%"
-  description: "เปิดปั๊มน้ำอัตโนมัติเมื่อดินแห้ง"
+        push:
+          sound: default
+    action: notify.mobile_app_maradosx
+  - data:
+      title: "\U0001F3E0 House Mode"
+      message: '{{ trigger.from_state.state }} → {{ trigger.to_state.state }}'
+    action: persistent_notification.create
+  - data:
+      alert_type: '{{ ''gps_away'' if trigger.to_state.state == ''Away'' else (''gps_home''
+        if trigger.to_state.state == ''Home'' else ''away_on'') }}'
+      value: '{{ trigger.from_state.state }} -> {{ trigger.to_state.state }}'
+      room: all
+    action: rest_command.send_alert
   mode: single
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.garden_soil_moisture
-      below: 40
-  condition:
-    - condition: time
-      after: "06:00:00"
-      before: "20:00:00"
-  action:
-    - service: rest_command.send_alert
+- id: mobile_comfort_mode_change
+  alias: "\U0001F4F1 [Mobile+LINE] Comfort Mode Change"
+  triggers:
+  - platform: state
+    entity_id: input_select.comfort_mode
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state.state != trigger.to_state.state }}'
+  actions:
+  - data:
+      title: "\U0001F321️ Comfort Mode"
+      message: '{{ trigger.from_state.state }} → {{ trigger.to_state.state }}'
       data:
-        alert_type: "soil_dry"
-        value: "{{ states('sensor.garden_soil_moisture') }}"
-        room: "garden"
-    - service: switch.turn_on
-      target:
-        entity_id: switch.garden_water_pump
-    - delay:
-        minutes: 10
-    - service: switch.turn_off
-      target:
-        entity_id: switch.garden_water_pump
-    - service: rest_command.send_alert
+        push:
+          sound: default
+    action: notify.mobile_app_maradosx
+  - data:
+      title: "\U0001F321️ Comfort Mode"
+      message: '{{ trigger.from_state.state }} → {{ trigger.to_state.state }}'
+    action: persistent_notification.create
+  - data:
+      alert_type: away_on
+      value: '{{ trigger.to_state.state }} mode'
+      room: all
+    action: rest_command.send_alert
+  mode: single
+- id: mobile_gas_alert
+  alias: "\U0001F4F1 [Mobile+LINE] Gas Alert - ALL CHANNELS"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.kitchen_gas_alert
+    to: 'on'
+  actions:
+  - data:
+      title: "\U0001F6A8 GAS LEAK ALERT!"
+      message: '⚠️ แก๊สรั่วในครัว! ค่า: {{ states(''sensor.kitchen_gas_lpg'') }} ADC'
       data:
-        alert_type: "pump_done"
-        value: "10"
-        room: "garden"
-
-# ─── [9] GARDEN LIGHT SCHEDULE ───────────────────────────────
-- id: "auto_garden_light_on"
-  alias: "Garden Light ON — 18:00"
-  trigger:
-    - platform: time
-      at: "18:00:00"
-  action:
-    - service: switch.turn_on
-      target:
-        entity_id: switch.garden_light
-    - service: rest_command.send_alert
+        push:
+          sound: alarm.caf
+          badge: 1
+          interruption-level: critical
+    action: notify.mobile_app_maradosx
+  - data:
+      title: "\U0001F6A8 GAS LEAK"
+      message: 'ค่า: {{ states(''sensor.kitchen_gas_lpg'') }} ADC'
+      notification_id: gas_alert_critical
+    action: persistent_notification.create
+  - target:
+      entity_id: light.living_room_light
+    data:
+      color_name: red
+      brightness: 255
+    action: light.turn_on
+  - data:
+      alert_type: gas_alert
+      value: '{{ states(''sensor.kitchen_gas_lpg'') }}'
+      room: kitchen
+    action: rest_command.send_alert
+  mode: single
+- id: mobile_water_leak
+  alias: "\U0001F4F1 [Mobile+LINE] Water Leak - ALL CHANNELS"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bathroom_water_leak
+    to: 'on'
+  actions:
+  - data:
+      title: "\U0001F4A7 WATER LEAK!"
+      message: ⚠️ น้ำรั่วในห้องน้ำ! รีบเช็คด่วน
       data:
-        alert_type: "garden_light_on"
-        value: "18:00"
-        room: "garden"
-
-- id: "auto_garden_light_off"
-  alias: "Garden Light OFF — 23:00"
-  trigger:
-    - platform: time
-      at: "23:00:00"
-  action:
-    - service: switch.turn_off
-      target:
-        entity_id: switch.garden_light
-
-# ─── [10] MORNING ROUTINE ────────────────────────────────────
-- id: "auto_morning_routine"
-  alias: "Morning Routine — 07:00"
-  description: "ปรับบ้านให้พร้อมตอนเช้า"
-  trigger:
-    - platform: time
-      at: "07:00:00"
-  condition:
+        push:
+          sound: alarm.caf
+          badge: 1
+          interruption-level: critical
+    action: notify.mobile_app_maradosx
+  - data:
+      title: "\U0001F4A7 WATER LEAK"
+      message: น้ำรั่ว!
+      notification_id: water_leak_critical
+    action: persistent_notification.create
+  - target:
+      entity_id: light.living_room_light
+    data:
+      color_name: red
+      brightness: 255
+    action: light.turn_on
+  - data:
+      alert_type: water_leak
+      value: detected
+      room: bathroom
+    action: rest_command.send_alert
+  mode: single
+- id: mobile_bathroom_fall
+  alias: "\U0001F4F1 [Mobile+LINE] Bathroom Fall - ALL CHANNELS"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bathroom_fall_alert
+    to: 'on'
+  actions:
+  - data:
+      title: "\U0001F198 FALL DETECTED!"
+      message: ⚠️ การล้มในห้องน้ำ!
+      data:
+        push:
+          sound: alarm.caf
+          interruption-level: critical
+    action: notify.mobile_app_maradosx
+  - data:
+      title: "\U0001F198 FALL"
+      message: การล้มในห้องน้ำ!
+      notification_id: bathroom_fall_critical
+    action: persistent_notification.create
+  - data:
+      alert_type: fall_alert
+      value: detected
+      room: bathroom
+    action: rest_command.send_alert
+  mode: single
+- id: mobile_door_intrusion
+  alias: "\U0001F4F1 [Mobile+LINE] Door Intrusion (Away/Security)"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.front_door
+    to: 'on'
+  conditions:
+  - condition: template
+    value_template: '{{ states(''input_select.house_mode'') in [''Away'',''Security'']
+      }}'
+  actions:
+  - data:
+      title: "\U0001F6A8 INTRUSION ALERT"
+      message: ประตูหน้าเปิดช่วง {{ states('input_select.house_mode') }} mode!
+      data:
+        push:
+          sound: alarm.caf
+          interruption-level: critical
+    action: notify.mobile_app_maradosx
+  - data:
+      title: "\U0001F6A8 INTRUSION"
+      message: Door opened during {{ states('input_select.house_mode') }}
+      notification_id: door_intrusion
+    action: persistent_notification.create
+  - data:
+      alert_type: security_door
+      value: '{{ now().strftime(''%H:%M:%S'') }}'
+      room: frontdoor
+    action: rest_command.send_alert
+  mode: single
+- id: mobile_pump_state
+  alias: "\U0001F4F1 [Mobile+LINE] Garden Pump State Change"
+  triggers:
+  - platform: state
+    entity_id: switch.garden_water_pump
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state.state != trigger.to_state.state and trigger.from_state.state
+      not in [''unknown'',''unavailable''] }}'
+  actions:
+  - data:
+      title: "\U0001F331 ปั๊มน้ำสวน"
+      message: "{% if trigger.to_state.state == 'on' %}\U0001F4A7 เริ่มรดน้ำ (ดิน
+        {{ states('sensor.garden_soil_moisture') }}%){% else %}✅ หยุดรดน้ำ (ดิน {{
+        states('sensor.garden_soil_moisture') }}%){% endif %}"
+      data:
+        push:
+          sound: default
+    action: notify.mobile_app_maradosx
+  - data:
+      title: "\U0001F331 Pump"
+      message: '{{ trigger.to_state.state }} (soil: {{ states(''sensor.garden_soil_moisture'')
+        }}%)'
+    action: persistent_notification.create
+  - data:
+      alert_type: '{{ ''soil_dry'' if trigger.to_state.state == ''on'' else ''pump_done''
+        }}'
+      value: '{{ states(''sensor.garden_soil_moisture'') }}'
+      room: garden
+    action: rest_command.send_alert
+  mode: single
+- id: mobile_garage_door
+  alias: "\U0001F4F1 [Mobile+LINE] Garage Door State"
+  triggers:
+  - platform: state
+    entity_id: cover.garage_door
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.state in [''open'',''opening''] }}'
+  actions:
+  - data:
+      title: "\U0001F697 ประตูโรงรถ"
+      message: '{{ trigger.to_state.state }} ที่ {{ now().strftime(''%H:%M:%S'') }}'
+      data:
+        push:
+          sound: default
+    action: notify.mobile_app_maradosx
+  - data:
+      title: "\U0001F697 Garage Door"
+      message: '{{ trigger.to_state.state }}'
+    action: persistent_notification.create
+  - data:
+      alert_type: garage_door
+      value: '{{ trigger.to_state.state }}'
+      room: garage
+    action: rest_command.send_alert
+  mode: single
+- id: smart_bedroom_light_on
+  alias: "\U0001F4A1 [Bedroom] Smart Light - Auto ON"
+  description: Motion+dark trigger. Blocked when alert/party scene active.
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bedroom_presence
+    to: 'on'
+    id: motion_on
+  - platform: numeric_state
+    entity_id: sensor.bedroom_ldr
+    above: 2800
+    id: ldr_dark
+  - platform: state
+    entity_id: switch.bedroom_light
+    to: 'off'
+    id: light_off
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.bedroom_presence
+    state: 'on'
+  - condition: state
+    entity_id: switch.bedroom_light
+    state: 'off'
+  - condition: numeric_state
+    entity_id: sensor.bedroom_ldr
+    above: 2800
+  - condition: state
+    entity_id: input_boolean.bedroom_light_manual_override
+    state: 'off'
+  - condition: not
+    conditions:
     - condition: state
       entity_id: input_select.house_mode
-      state: "Home"
-  action:
-    - service: input_select.select_option
-      target:
+      state: Away
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Security
+    - condition: state
+      entity_id: input_select.comfort_mode
+      state: Sleep
+  - condition: state
+    entity_id: input_boolean.alert_flash_active
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.party_loop_active
+    state: 'off'
+  actions:
+  - action: switch.turn_on
+    data:
+      entity_id: switch.bedroom_light
+  mode: single
+- id: smart_bedroom_light_off
+  alias: "\U0001F4A1 [Bedroom] Smart Light - Auto OFF"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bedroom_presence
+    to: 'off'
+    for:
+      minutes: 5
+    id: motion_clear
+  - platform: template
+    value_template: '{{ states(''switch.bedroom_light'') == ''on'' and states(''sensor.bedroom_ldr'')
+      | int(0) < 2800 }}'
+    for:
+      seconds: 30
+    id: ldr_bright
+  conditions:
+  - condition: state
+    entity_id: switch.bedroom_light
+    state: 'on'
+  - condition: state
+    entity_id: input_boolean.bedroom_light_manual_override
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.alert_flash_active
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.party_loop_active
+    state: 'off'
+  actions:
+  - action: switch.turn_off
+    data:
+      entity_id: switch.bedroom_light
+  mode: single
+- id: smart_bedroom_light_override_detect
+  alias: "\U0001F4A1 [Bedroom] Smart Light - Detect Manual Override"
+  description: When user manually toggles the light → enable override for 30 min (auto-clear)
+  triggers:
+  - platform: state
+    entity_id: switch.bedroom_light
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.context.parent_id is none }}'
+  actions:
+  - target:
+      entity_id: input_boolean.bedroom_light_manual_override
+    action: input_boolean.turn_on
+  - delay:
+      minutes: 30
+  - target:
+      entity_id: input_boolean.bedroom_light_manual_override
+    action: input_boolean.turn_off
+  mode: restart
+- id: smart_living_room_light_on
+  alias: "\U0001F4A1 [Living Room] Smart Light - Auto ON"
+  description: Motion+dark trigger. Blocked when alert/party scene active.
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.living_room_motion
+    to: 'on'
+    id: motion_on
+  - platform: numeric_state
+    entity_id: sensor.living_room_ldr
+    above: 2800
+    id: ldr_dark
+  - platform: state
+    entity_id: light.living_room_light
+    to: 'off'
+    id: light_off
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.living_room_motion
+    state: 'on'
+  - condition: state
+    entity_id: light.living_room_light
+    state: 'off'
+  - condition: numeric_state
+    entity_id: sensor.living_room_ldr
+    above: 2800
+  - condition: state
+    entity_id: input_boolean.living_room_light_manual_override
+    state: 'off'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Away
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Security
+    - condition: state
+      entity_id: input_select.comfort_mode
+      state: Sleep
+  - condition: state
+    entity_id: input_boolean.alert_flash_active
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.party_loop_active
+    state: 'off'
+  actions:
+  - action: light.turn_on
+    data:
+      entity_id: light.living_room_light
+      brightness_pct: 80
+      color_temp_kelvin: 3000
+  mode: single
+- id: smart_living_room_light_off
+  alias: "\U0001F4A1 [Living Room] Smart Light - Auto OFF"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.living_room_motion
+    to: 'off'
+    for:
+      minutes: 5
+    id: motion_clear
+  - platform: template
+    value_template: '{{ states(''light.living_room_light'') == ''on'' and states(''sensor.living_room_ldr'')
+      | int(0) < 2800 }}'
+    for:
+      seconds: 30
+    id: ldr_bright
+  conditions:
+  - condition: state
+    entity_id: light.living_room_light
+    state: 'on'
+  - condition: state
+    entity_id: input_boolean.living_room_light_manual_override
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.alert_flash_active
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.party_loop_active
+    state: 'off'
+  actions:
+  - action: light.turn_off
+    data:
+      entity_id: light.living_room_light
+  mode: single
+- id: smart_living_room_light_override_detect
+  alias: "\U0001F4A1 [Living Room] Smart Light - Detect Manual Override"
+  description: When user manually toggles the light → enable override for 30 min (auto-clear)
+  triggers:
+  - platform: state
+    entity_id: light.living_room_light
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.context.parent_id is none }}'
+  actions:
+  - target:
+      entity_id: input_boolean.living_room_light_manual_override
+    action: input_boolean.turn_on
+  - delay:
+      minutes: 30
+  - target:
+      entity_id: input_boolean.living_room_light_manual_override
+    action: input_boolean.turn_off
+  mode: restart
+- id: smart_bathroom_light_on
+  alias: "\U0001F4A1 [Bathroom] Smart Light - Auto ON"
+  description: Motion+dark trigger. Blocked when alert/party scene active.
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bathroom_presence
+    to: 'on'
+    id: motion_on
+  - platform: numeric_state
+    entity_id: sensor.bathroom_ldr
+    above: 2200
+    id: ldr_dark
+  - platform: state
+    entity_id: switch.bathroom_light
+    to: 'off'
+    id: light_off
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.bathroom_presence
+    state: 'on'
+  - condition: state
+    entity_id: switch.bathroom_light
+    state: 'off'
+  - condition: numeric_state
+    entity_id: sensor.bathroom_ldr
+    above: 2200
+  - condition: state
+    entity_id: input_boolean.bathroom_light_manual_override
+    state: 'off'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Away
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Security
+    - condition: state
+      entity_id: input_select.comfort_mode
+      state: Sleep
+  - condition: state
+    entity_id: input_boolean.alert_flash_active
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.party_loop_active
+    state: 'off'
+  actions:
+  - action: switch.turn_on
+    data:
+      entity_id: switch.bathroom_light
+  mode: single
+- id: smart_bathroom_light_off
+  alias: "\U0001F4A1 [Bathroom] Smart Light - Auto OFF"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bathroom_presence
+    to: 'off'
+    for:
+      minutes: 5
+    id: motion_clear
+  - platform: template
+    value_template: '{{ states(''switch.bathroom_light'') == ''on'' and states(''sensor.bathroom_ldr'')
+      | int(0) < 2200 }}'
+    for:
+      seconds: 30
+    id: ldr_bright
+  conditions:
+  - condition: state
+    entity_id: switch.bathroom_light
+    state: 'on'
+  - condition: state
+    entity_id: input_boolean.bathroom_light_manual_override
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.alert_flash_active
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.party_loop_active
+    state: 'off'
+  actions:
+  - action: switch.turn_off
+    data:
+      entity_id: switch.bathroom_light
+  mode: single
+- id: smart_bathroom_light_override_detect
+  alias: "\U0001F4A1 [Bathroom] Smart Light - Detect Manual Override"
+  description: When user manually toggles the light → enable override for 30 min (auto-clear)
+  triggers:
+  - platform: state
+    entity_id: switch.bathroom_light
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.context.parent_id is none }}'
+  actions:
+  - target:
+      entity_id: input_boolean.bathroom_light_manual_override
+    action: input_boolean.turn_on
+  - delay:
+      minutes: 30
+  - target:
+      entity_id: input_boolean.bathroom_light_manual_override
+    action: input_boolean.turn_off
+  mode: restart
+- id: smart_garage_light_on
+  alias: "\U0001F4A1 [Garage] Smart Light - Auto ON"
+  description: Motion+dark trigger. Blocked when alert/party scene active.
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.garage_motion
+    to: 'on'
+    id: motion_on
+  - platform: numeric_state
+    entity_id: sensor.garage_ldr
+    above: 2800
+    id: ldr_dark
+  - platform: state
+    entity_id: switch.garage_light
+    to: 'off'
+    id: light_off
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.garage_motion
+    state: 'on'
+  - condition: state
+    entity_id: switch.garage_light
+    state: 'off'
+  - condition: numeric_state
+    entity_id: sensor.garage_ldr
+    above: 2800
+  - condition: state
+    entity_id: input_boolean.garage_light_manual_override
+    state: 'off'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Away
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Security
+    - condition: state
+      entity_id: input_select.comfort_mode
+      state: Sleep
+  - condition: state
+    entity_id: input_boolean.alert_flash_active
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.party_loop_active
+    state: 'off'
+  actions:
+  - action: switch.turn_on
+    data:
+      entity_id: switch.garage_light
+  mode: single
+- id: smart_garage_light_off
+  alias: "\U0001F4A1 [Garage] Smart Light - Auto OFF"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.garage_motion
+    to: 'off'
+    for:
+      minutes: 5
+    id: motion_clear
+  - platform: template
+    value_template: '{{ states(''switch.garage_light'') == ''on'' and states(''sensor.garage_ldr'')
+      | int(0) < 2800 }}'
+    for:
+      seconds: 30
+    id: ldr_bright
+  conditions:
+  - condition: state
+    entity_id: switch.garage_light
+    state: 'on'
+  - condition: state
+    entity_id: input_boolean.garage_light_manual_override
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.alert_flash_active
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.party_loop_active
+    state: 'off'
+  actions:
+  - action: switch.turn_off
+    data:
+      entity_id: switch.garage_light
+  mode: single
+- id: smart_garage_light_override_detect
+  alias: "\U0001F4A1 [Garage] Smart Light - Detect Manual Override"
+  description: When user manually toggles the light → enable override for 30 min (auto-clear)
+  triggers:
+  - platform: state
+    entity_id: switch.garage_light
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.context.parent_id is none }}'
+  actions:
+  - target:
+      entity_id: input_boolean.garage_light_manual_override
+    action: input_boolean.turn_on
+  - delay:
+      minutes: 30
+  - target:
+      entity_id: input_boolean.garage_light_manual_override
+    action: input_boolean.turn_off
+  mode: restart
+- id: pump_auto_on_when_dry
+  alias: "\U0001F331 Pump - Auto ON (dry + daytime + not raining)"
+  description: ดินแห้ง <45% + กลางวัน + ไม่ฝน → เปิดปั๊ม (template trigger fires when
+    conditions met)
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.garden_soil_moisture
+    below: 45
+  - platform: template
+    value_template: '{{ states(''sensor.garden_soil_moisture'') | int(0) < 45 and
+      states(''switch.garden_water_pump'') == ''off'' }}'
+  conditions:
+  - condition: state
+    entity_id: switch.garden_water_pump
+    state: 'off'
+  - condition: time
+    after: 06:00:00
+    before: '20:00:00'
+  - condition: template
+    value_template: '{{ states(''weather.forecast_baan'') not in [''rainy'',''pouring'',''lightning-rainy'',''lightning'']
+      }}'
+  actions:
+  - action: switch.turn_on
+    target:
+      entity_id: switch.garden_water_pump
+  mode: single
+- id: pump_auto_off_when_wet
+  alias: "\U0001F331 Pump - Auto OFF (moisture target reached)"
+  description: ดินชื้นถึง 60% → ปิดปั๊ม (target reached)
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.garden_soil_moisture
+    above: 60
+  conditions:
+  - condition: state
+    entity_id: switch.garden_water_pump
+    state: 'on'
+  actions:
+  - target:
+      entity_id: switch.garden_water_pump
+    action: switch.turn_off
+  mode: single
+- id: pump_safety_max_runtime
+  alias: "\U0001F6A8 Pump - Safety Max Runtime (10 min)"
+  description: 'Safety: ถ้าปั๊มเปิดนาน 10 นาที → force off + alert (กันท่วม)'
+  triggers:
+  - platform: state
+    entity_id: switch.garden_water_pump
+    to: 'on'
+    for:
+      minutes: 10
+  actions:
+  - target:
+      entity_id: switch.garden_water_pump
+    action: switch.turn_off
+  - data:
+      title: "\U0001F6A8 Pump Safety Cutoff"
+      message: ปั๊มน้ำเปิดเกิน 10 นาที → ตัดให้อัตโนมัติ ตรวจสอบ soil sensor!
+      data:
+        push:
+          sound: alarm.caf
+          interruption-level: critical
+    action: notify.mobile_app_maradosx
+  - data:
+      title: "\U0001F6A8 Pump Safety Cutoff"
+      message: ปั๊มเปิดเกิน 10 นาที — ตัดอัตโนมัติ ตรวจสอบ soil sensor
+      notification_id: pump_safety
+    action: persistent_notification.create
+  - data:
+      alert_type: pump_done
+      value: SAFETY_CUTOFF_10MIN
+      room: garden
+    action: rest_command.send_alert
+  mode: single
+- id: party_button_to_loop
+  alias: "\U0001F389 Party Button → Start Loop"
+  description: When dashboard/ชาวี calls party_on script → activate party_loop_active
+    for our automation to drive color loop
+  triggers:
+  - platform: state
+    entity_id: script.living_room_party_on
+    to: 'on'
+  actions:
+  - action: input_boolean.turn_on
+    data:
+      entity_id: input_boolean.party_loop_active
+  mode: single
+- id: party_off_button_to_loop_stop
+  alias: "\U0001F6D1 Party Off Button → Stop Loop"
+  triggers:
+  - platform: state
+    entity_id: script.living_room_party_off
+    to: 'on'
+  actions:
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.party_loop_active
+  - action: light.turn_on
+    data:
+      entity_id: light.living_room_light
+      color_temp_kelvin: 3000
+      brightness_pct: 80
+      transition: 1
+  mode: single
+- id: party_loop_executor
+  alias: "\U0001F3A8 Party Loop Executor (color cycle)"
+  description: While party_loop_active is on → cycle through 5 vibrant colors continuously
+  triggers:
+  - platform: state
+    entity_id: input_boolean.party_loop_active
+    to: 'on'
+  actions:
+  - repeat:
+      while:
+      - condition: state
+        entity_id: input_boolean.party_loop_active
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 255
+          - 20
+          - 147
+          brightness_pct: 100
+      - delay:
+          milliseconds: 700
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 0
+          - 255
+          - 255
+          brightness_pct: 100
+      - delay:
+          milliseconds: 700
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 255
+          - 255
+          - 0
+          brightness_pct: 100
+      - delay:
+          milliseconds: 700
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 148
+          - 0
+          - 211
+          brightness_pct: 100
+      - delay:
+          milliseconds: 700
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 0
+          - 255
+          - 0
+          brightness_pct: 100
+      - delay:
+          milliseconds: 700
+  mode: restart
+- id: alert_flash_executor
+  alias: "\U0001F6A8 Alert Flash - Red Blink Loop"
+  description: Blink red forever while alert_flash_active=on. Press again to stop.
+  triggers:
+  - platform: state
+    entity_id: input_boolean.alert_flash_active
+    to: 'on'
+  actions:
+  - repeat:
+      while:
+      - condition: state
+        entity_id: input_boolean.alert_flash_active
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 255
+          - 0
+          - 0
+          brightness_pct: 100
+      - delay:
+          milliseconds: 400
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 80
+          - 0
+          - 0
+          brightness_pct: 30
+      - delay:
+          milliseconds: 400
+  mode: restart
+- id: scene_default_smart
+  alias: "\U0001F3AC Scene Default - Smart Switch"
+  triggers:
+  - platform: state
+    entity_id: input_button.scene_default
+  actions:
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.party_loop_active
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.alert_flash_active
+  - delay:
+      milliseconds: 300
+  - action: light.turn_on
+    data:
+      entity_id: light.living_room_light
+      color_temp_kelvin: 3000
+      brightness_pct: 80
+      transition: 1
+  mode: restart
+- id: scene_welcome_smart
+  alias: "\U0001F3AC Scene Welcome - Smart Switch"
+  triggers:
+  - platform: state
+    entity_id: input_button.scene_welcome
+  actions:
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.party_loop_active
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.alert_flash_active
+  - delay:
+      milliseconds: 300
+  - action: light.turn_on
+    data:
+      entity_id: light.living_room_light
+      rgb_color:
+      - 255
+      - 180
+      - 100
+      brightness_pct: 95
+      transition: 1
+  mode: restart
+- id: scene_sunrise_smart
+  alias: "\U0001F3AC Scene Sunrise - Smart Switch"
+  triggers:
+  - platform: state
+    entity_id: input_button.scene_sunrise
+  actions:
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.party_loop_active
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.alert_flash_active
+  - delay:
+      milliseconds: 300
+  - action: light.turn_on
+    data:
+      entity_id: light.living_room_light
+      rgb_color:
+      - 255
+      - 140
+      - 60
+      brightness_pct: 70
+      transition: 1
+  mode: restart
+- id: scene_calm_smart
+  alias: "\U0001F3AC Scene Calm - Smart Switch"
+  triggers:
+  - platform: state
+    entity_id: input_button.scene_calm
+  actions:
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.party_loop_active
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.alert_flash_active
+  - delay:
+      milliseconds: 300
+  - action: light.turn_on
+    data:
+      entity_id: light.living_room_light
+      rgb_color:
+      - 60
+      - 140
+      - 255
+      brightness_pct: 40
+      transition: 1
+  mode: restart
+- id: scene_bedtime_smart
+  alias: "\U0001F3AC Scene Bedtime - Smart Switch"
+  triggers:
+  - platform: state
+    entity_id: input_button.scene_bedtime
+  actions:
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.party_loop_active
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.alert_flash_active
+  - delay:
+      milliseconds: 300
+  - action: light.turn_on
+    data:
+      entity_id: light.living_room_light
+      rgb_color:
+      - 255
+      - 100
+      - 80
+      brightness_pct: 15
+      transition: 1
+  mode: restart
+- id: comfort_mode_light_scene
+  alias: "\U0001F4A1 Comfort Mode → Light Auto Color"
+  description: เปลี่ยน comfort_mode → ไฟห้องนั่งเล่นเปลี่ยนสีตามอารมณ์ทันที
+  triggers:
+  - platform: state
+    entity_id: input_select.comfort_mode
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state.state != trigger.to_state.state }}'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Away
+    - condition: state
+      entity_id: input_select.house_mode
+      state: Security
+  - condition: state
+    entity_id: input_boolean.alert_flash_active
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.party_loop_active
+    state: 'off'
+  actions:
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.party_loop_active
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.alert_flash_active
+  - delay:
+      milliseconds: 200
+  - choose:
+    - conditions:
+      - condition: state
         entity_id: input_select.comfort_mode
-      data:
-        option: "Normal"
-    - service: rest_command.send_alert
-      data:
-        alert_type: "good_morning"
-        value: "07:00"
-        room: "all"
-
-# ─── Schedule: ปิดไฟทุกคืน 23:00 ────────────────────────────
-- id: "schedule_lights_off_night"
-  alias: "🌙 ปิดไฟทุกห้อง 23:00"
-  description: "ปิดไฟทุกห้องอัตโนมัติตอน 23:00 ทุกคืน"
-  trigger:
-    - platform: time
-      at: "23:00:00"
-  action:
-    - service: switch.turn_off
-      target:
-        entity_id:
-          - switch.living_room_light
-          - switch.bedroom_light
-          - switch.kitchen_vent_fan
-          - switch.garden_light
-    - service: rest_command.send_alert
-      data:
-        alert_type: "lights_off_night"
-        value: "23:00"
-        room: "all"
-
-# ─── Schedule: เปิดปั๊มรดน้ำ 07:00 ──────────────────────────
-- id: "schedule_water_pump_morning"
-  alias: "🌅 รดน้ำอัตโนมัติ 07:00"
-  description: "เปิดปั๊มน้ำตอน 07:00 นาน 10 นาที แล้วปิดเอง"
-  trigger:
-    - platform: time
-      at: "07:00:00"
-  action:
-    - service: switch.turn_on
-      target:
-        entity_id: switch.garden_water_pump
-    - delay:
-        minutes: 10
-    - service: switch.turn_off
-      target:
-        entity_id: switch.garden_water_pump
-    - service: rest_command.send_alert
-      data:
-        alert_type: "pump_done"
-        value: "10"
-        room: "garden"
-
-# ─── Alert: ประตูไม่ล็อกนานเกิน 10 นาที ─────────────────────
-- id: "alert_door_unlocked_too_long"
-  alias: "🚪 แจ้งเตือนประตูไม่ล็อกนานเกิน 10 นาที"
-  description: "ถ้าประตูหน้าบ้านไม่ได้ล็อกนานเกิน 10 นาที ให้แจ้ง LINE"
-  trigger:
-    - platform: state
-      entity_id: switch.front_door_lock
-      to: "off"
-      for:
-        minutes: 10
-  condition:
-    - condition: state
-      entity_id: input_select.house_mode
-      state: "Home"
-  action:
-    - service: rest_command.send_alert
-      data:
-        alert_type: "door_open"
-        value: "10"
-        room: "frontdoor"
-
-# ─── GPS: ออกจากบ้าน → Away Mode ────────────────────────────
-- id: "gps_auto_away"
-  alias: "📍 GPS - ออกจากบ้าน → Away Mode"
-  description: "เมื่อ GPS ตรวจจับว่าออกจาก Home Zone → Away Mode"
-  trigger:
-    - platform: state
-      entity_id: person.athit_boonpinit
-      to: "not_home"
-      for:
-        minutes: 2
-  condition:
-    - condition: state
-      entity_id: input_select.house_mode
-      state: "Home"
-  action:
-    - service: input_select.select_option
-      target:
+        state: Normal
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          color_temp_kelvin: 4000
+          brightness_pct: 80
+          transition: 2
+    - conditions:
+      - condition: state
+        entity_id: input_select.comfort_mode
+        state: Relax
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 255
+          - 160
+          - 80
+          brightness_pct: 50
+          transition: 2
+    - conditions:
+      - condition: state
+        entity_id: input_select.comfort_mode
+        state: Warm
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          color_temp_kelvin: 2700
+          brightness_pct: 75
+          transition: 2
+    - conditions:
+      - condition: state
+        entity_id: input_select.comfort_mode
+        state: Sleep
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 255
+          - 100
+          - 80
+          brightness_pct: 15
+          transition: 3
+      - delay:
+          seconds: 5
+      - action: light.turn_off
+        data:
+          entity_id: light.living_room_light
+          transition: 3
+  mode: restart
+- id: light_mode_scene_smart
+  alias: "\U0001F3A8 Living Room Light - Mode Scene"
+  description: Home=Default Warm 3000K@80% | Warm=ส้มอ่อน | Sleep=ม่วง | Relax=ฟ้า
+    | Away=off | Security=red
+  triggers:
+  - platform: state
+    entity_id: input_select.comfort_mode
+  - platform: state
+    entity_id: input_select.house_mode
+  actions:
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.party_loop_active
+  - action: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.alert_flash_active
+  - delay:
+      milliseconds: 300
+  - choose:
+    - conditions:
+      - condition: state
         entity_id: input_select.house_mode
-      data:
-        option: "Away"
-    - service: rest_command.send_alert
-      data:
-        alert_type: "gps_away"
-        value: "not_home"
-        room: "all"
-
-# ─── GPS: กลับบ้าน → Home Mode ──────────────────────────────
-- id: "gps_auto_home"
-  alias: "🏠 GPS - กลับบ้าน → Home Mode"
-  description: "เมื่อ GPS ตรวจจับว่ากลับเข้า Home Zone → Home Mode"
-  trigger:
-    - platform: state
-      entity_id: person.athit_boonpinit
-      to: "home"
-  action:
-    - service: input_select.select_option
-      target:
+        state: Away
+      sequence:
+      - action: light.turn_off
+        data:
+          entity_id: light.living_room_light
+          transition: 1
+    - conditions:
+      - condition: state
         entity_id: input_select.house_mode
-      data:
-        option: "Home"
-    - service: rest_command.send_alert
-      data:
-        alert_type: "gps_home"
-        value: "home"
-        room: "all"
+        state: Security
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 220
+          - 40
+          - 40
+          brightness_pct: 70
+          transition: 1
+    - conditions:
+      - condition: state
+        entity_id: input_select.house_mode
+        state: Home
+      - condition: state
+        entity_id: input_select.comfort_mode
+        state: Sleep
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 148
+          - 0
+          - 211
+          brightness_pct: 25
+          transition: 2
+    - conditions:
+      - condition: state
+        entity_id: input_select.house_mode
+        state: Home
+      - condition: state
+        entity_id: input_select.comfort_mode
+        state: Warm
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 255
+          - 180
+          - 120
+          brightness_pct: 85
+          transition: 2
+    - conditions:
+      - condition: state
+        entity_id: input_select.house_mode
+        state: Home
+      - condition: state
+        entity_id: input_select.comfort_mode
+        state: Relax
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          rgb_color:
+          - 119
+          - 198
+          - 255
+          brightness_pct: 75
+          transition: 2
+    - conditions:
+      - condition: state
+        entity_id: input_select.house_mode
+        state: Home
+      - condition: state
+        entity_id: input_select.comfort_mode
+        state: Normal
+      sequence:
+      - action: light.turn_on
+        data:
+          entity_id: light.living_room_light
+          color_temp_kelvin: 3000
+          brightness_pct: 80
+          transition: 2
+    default: []
+  mode: restart
+- id: chavee_line_bypass
+  alias: "\U0001F4AC ChAvee Bypass - LINE Webhook Handler"
+  description: LINE webhook -> chat history -> Anthropic -> execute multi-action + reply
+  triggers:
+  - platform: webhook
+    webhook_id: chavee_line_v6
+    local_only: false
+    allowed_methods:
+    - POST
+  actions:
+  - variables:
+      msg_text: '{{ (trigger.json.events[0].message.text) if (trigger.json.events and trigger.json.events|length > 0 and trigger.json.events[0].message is defined) else '''' }}'
+      reply_token: '{{ (trigger.json.events[0].replyToken) if (trigger.json.events and trigger.json.events|length > 0) else '''' }}'
+      user_id: '{{ (trigger.json.events[0].source.userId) if (trigger.json.events and trigger.json.events|length > 0 and trigger.json.events[0].source is defined and trigger.json.events[0].source.userId is defined) else ''line_user'' }}'
+  - condition: template
+    value_template: '{{ msg_text != '''' and reply_token != '''' }}'
+  - action: rest_command.get_chat_history
+    continue_on_error: true
+    data:
+      uid: '{{ user_id }}'
+    response_variable: hist
+  - variables:
+      history: >-
+        {% set rows = (hist.content if (hist is defined and hist.content is defined) else []) %}{% if rows %}[Previous conversation oldest-to-newest: {% for r in rows | reverse %}(user: {{ r.message }} / chavee: {{ r.reply }}) {% endfor %}] {% endif %}
+  - action: rest_command.ask_anthropic
+    data:
+      user_msg: '{{ (((history | trim) ~ '' ## NEW MESSAGE: '' ~ msg_text) if (history | trim) else msg_text) | replace(''"'',''\\"'') | replace(''\n'', '' '') }}'
+    response_variable: ai_response
+  - variables:
+      raw_text: '{{ (ai_response.content.content[0].text | replace(''```json'','''') | replace(''```'','''') | trim) if (ai_response.content is defined and ai_response.content.content is defined) else ''{}'' }}'
+      parsed: '{{ raw_text if raw_text is mapping else (raw_text | from_json) }}'
+  - action: rest_command.chavee_line_reply
+    data:
+      reply_token: '{{ reply_token }}'
+      text: '{{ (parsed.reply_th if parsed.reply_th is defined else ''รับทราบครับ'') | replace(''"'',''\\"'') | replace(''\n'','' '') }}'
+  - action: rest_command.log_chat_supabase
+    continue_on_error: true
+    data:
+      user_id: '{{ user_id }}'
+      msg: '{{ msg_text | replace(''"'','''') | replace(''\n'','' '') }}'
+      reply: '{{ (parsed.reply_th | default(''-'')) | replace(''"'','''') | replace(''\n'','' '') }}'
+      intent: '{{ parsed.intent | default(''chat'') }}'
+  - repeat:
+      for_each: '{{ parsed.haActions | default([]) }}'
+      sequence:
+      - continue_on_error: true
+        action: '{{ repeat.item.service | replace(''/'',''.'') }}'
+        data: '{{ repeat.item.body | default({}) }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ (parsed.haActions | default([]) | length == 0) and parsed.haService is defined and parsed.haService and parsed.haService != ''null'' }}'
+      sequence:
+      - continue_on_error: true
+        action: '{{ parsed.haService | replace(''/'',''.'') }}'
+        data: '{{ parsed.haBody | default({}) }}'
+  mode: parallel
+  max: 10
+- id: party_loop_safety_off
+  alias: "🛑 Party Loop - Safety Auto-Off (30 min)"
+  description: Prevent runaway party loop hitting 10000-iteration cap — force off after 30 min continuous
+  triggers:
+  - platform: state
+    entity_id: input_boolean.party_loop_active
+    to: "on"
+    for:
+      minutes: 30
+  actions:
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.party_loop_active
+  mode: single
+- id: fix_away_close_garage_and_lock
+  alias: "\U0001F512 [Fix] Away - close garage + lock front door"
+  description: "Away mode -> close garage door + auto-lock front door (bug #6/#7)"
+  trigger:
+  - platform: state
+    entity_id: input_select.house_mode
+    to: Away
+  action:
+  - service: cover.close_cover
+    target:
+      entity_id: cover.garage_door
+  - service: lock.lock
+    target:
+      entity_id: lock.front_door_lock
+  mode: single
+- id: fix_security_lock
+  alias: "\U0001F512 [Fix] Security - lock front door"
+  description: "Security mode -> auto-lock front door (bug #7)"
+  trigger:
+  - platform: state
+    entity_id: input_select.house_mode
+    to: Security
+  action:
+  - service: lock.lock
+    target:
+      entity_id: lock.front_door_lock
+  mode: single
+- id: fix_garden_lights_off
+  alias: "\U0001F333 [Fix] garden_lights off on Away/Security/Sleep/23:00"
+  description: "Turn off forgotten switch.garden_lights in away/security/sleep/night (bug #4/#9)"
+  trigger:
+  - platform: state
+    entity_id: input_select.house_mode
+    to: Away
+  - platform: state
+    entity_id: input_select.house_mode
+    to: Security
+  - platform: state
+    entity_id: input_select.comfort_mode
+    to: Sleep
+  - platform: time
+    at: "23:00:00"
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.garden_lights
+  mode: single
+- id: fix_garage_autoclose
+  alias: "\U0001F697 [Fix] garage auto-close 5 min after opening"
+  description: "If garage door stays open 5 min -> auto close (bug #6 safety)"
+  trigger:
+  - platform: state
+    entity_id: cover.garage_door
+    to: open
+    for: "00:05:00"
+  condition:
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Home
+  action:
+  - service: cover.close_cover
+    target:
+      entity_id: cover.garage_door
+  mode: single
+- id: air_purifier_auto_aqi
+  alias: "\U0001F4A8 [Fix] air purifier auto by AQI (air_alert)"
+  description: "air_alert on -> purifier on, off -> purifier off (bug #5)"
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.living_room_air_alert
+    to: "on"
+    id: bad
+  - platform: state
+    entity_id: binary_sensor.living_room_air_alert
+    to: "off"
+    id: good
+  condition:
+  - condition: state
+    entity_id: input_select.house_mode
+    state: Home
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: bad
+      sequence:
+      - service: switch.turn_on
+        target:
+          entity_id: switch.living_room_air_purifier
+    - conditions:
+      - condition: trigger
+        id: good
+      sequence:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.living_room_air_purifier
+  mode: single
+- id: fix_alert_flash_safety_autoclear
+  alias: "\U0001F6A8 [Fix] sustained alert flash > 10 min -> auto clear"
+  description: "Safety net: if alert_flash_active stuck on 10 min -> clear (bug #15)"
+  trigger:
+  - platform: state
+    entity_id: input_boolean.alert_flash_active
+    to: "on"
+    for: "00:10:00"
+  action:
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.alert_flash_active
+  mode: single

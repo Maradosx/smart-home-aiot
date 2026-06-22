@@ -8,6 +8,8 @@
 
 ![ESP32](https://img.shields.io/badge/ESP32-DevKit_V1-E7352C?logo=espressif&logoColor=white) ![Home Assistant](https://img.shields.io/badge/Home_Assistant-2026.4.2-41BDF5?logo=home-assistant&logoColor=white) ![Claude](https://img.shields.io/badge/Anthropic-Claude_Haiku_4.5-D4A27F) ![MQTT](https://img.shields.io/badge/MQTT-Mosquitto-660066) ![Zigbee](https://img.shields.io/badge/Zigbee-Z2M_2.10.1-EB0928) ![AWS](https://img.shields.io/badge/AWS-Lambda_+_EC2-FF9900?logo=amazonaws&logoColor=white)
 
+> 🔄 **Latest update (23 Jun 2026):** ChAvee AI now supports **multi-action commands** (e.g. "turn on the light and the fan") and **conversation memory** (Supabase-backed context, so follow-ups like "turn it off" resolve correctly). Completed a **behavioral-reasonableness audit** — 15 fixes incl. manual-override lights (no re-trigger while you sleep), garage auto-close + auto-lock on Away, fan hysteresis, GPS debounce, and an AI "reset" kill-switch scene. Live: **244 entities · 79 automations · 8 scripts**.
+
 ---
 
 ## ✨ Highlights

@@ -88,3 +88,6 @@ thesisตัวอย่างรุ่นพี่/
 # (lambda.zip rebuilds from lambda_function.py; .docx files hold personal/academic info)
 alexa/lambda.zip
 *.docx
+RESUME_AUGUST.md
+pastelia-online/
+.remember/

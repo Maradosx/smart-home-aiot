@@ -5,10 +5,7 @@
 
 # ─── Core ────────────────────────────────────────────────────
 homeassistant:
-  name: "Smart Home AIoT"
-  latitude: 13.7563     # placeholder (Bangkok center) — set to your real home location
-  longitude: 100.5018   # placeholder (Bangkok center) — set to your real home location
-  elevation: 10
+  name: "Home"
   unit_system: metric
   time_zone: Asia/Bangkok
   currency: THB
@@ -23,35 +20,60 @@ emulated_hue:
   listen_port: 80
   expose_by_default: false
   entities:
+    # ── Living Room ──
+    light.living_room_light:
+      name: "Living Room Light"
+      hidden: false
+    switch.living_room_fan:
+      name: "Living Room Fan"
+      hidden: false
+    # ── Bedroom ──
     switch.bedroom_light:
       name: "Bedroom Light"
       hidden: false
     switch.bedroom_fan:
       name: "Bedroom Fan"
       hidden: false
+    cover.bedroom_curtain:
+      name: "Bedroom Curtain"
+      hidden: false
+    # ── Kitchen ──
     switch.kitchen_light:
       name: "Kitchen Light"
       hidden: false
     switch.kitchen_fan:
       name: "Kitchen Fan"
       hidden: false
+    switch.kitchen_stove:
+      name: "Kitchen Stove"
+      hidden: false
+    # ── Bathroom ──
     switch.bathroom_light:
       name: "Bathroom Light"
       hidden: false
-    switch.garden_light:
-      name: "Garden Light"
+    # ── Garden ──
+    switch.garden_light_1:
+      name: "Garden Light One"
+      hidden: false
+    switch.garden_light_2:
+      name: "Garden Light Two"
       hidden: false
     switch.garden_water_pump:
       name: "Garden Pump"
       hidden: false
+    # ── Garage ──
     switch.garage_light:
       name: "Garage Light"
       hidden: false
-    cover.bedroom_curtain:
-      name: "Bedroom Curtain"
+    switch.garage_pathway_light:
+      name: "Pathway Light"
       hidden: false
     cover.garage_door:
       name: "Garage Door"
+      hidden: false
+    # ── Front Door (planned) ──
+    switch.front_door_lock:
+      name: "Front Door Lock"
       hidden: false
 
 # ─── HTTP / Lovelace ─────────────────────────────────────────
@@ -65,6 +87,14 @@ http:
 lovelace:
   mode: yaml
   resources: []
+  dashboards:
+    detail-by-room:
+      mode: yaml
+      filename: detail-by-room.yaml
+      title: "Detail by Room / รายห้อง"
+      icon: mdi:floor-plan
+      show_in_sidebar: true
+      require_admin: false
 
 # ─── MQTT Entities (HA 2024+ format) ─────────────────────────
 # Broker ตั้งผ่าน UI: Settings → Integrations → MQTT
@@ -135,7 +165,7 @@ mqtt:
       state_topic: "home/kitchen/gas_lpg"
       unit_of_measurement: "ADC"
       icon: mdi:gas-cylinder
-      unique_id: "sensor_kitchen_gas"
+      unique_id: "sensor_kitchen_gas_lpg"
 
     - name: "Kitchen LDR"
       state_topic: "home/kitchen/ldr"
@@ -149,6 +179,12 @@ mqtt:
       unit_of_measurement: "ADC"
       icon: mdi:brightness-6
       unique_id: "sensor_bathroom_ldr"
+
+    - name: "Garden LDR"
+      state_topic: "home/garden/ldr"
+      unit_of_measurement: "ADC"
+      icon: mdi:brightness-6
+      unique_id: "sensor_garden_ldr"
 
     - name: "Garden Soil Moisture"
       state_topic: "home/garden/soil_moisture"
@@ -173,6 +209,60 @@ mqtt:
       unit_of_measurement: "ADC"
       icon: mdi:brightness-6
       unique_id: "sensor_garage_ldr"
+
+    # ── Tuya TS011F Power Monitoring — Living Room Fan ────
+    - name: "Living Room Fan Power"
+      state_topic: "zigbee2mqtt/living_room_fan"
+      value_template: "{{ value_json.power | default(0) }}"
+      unit_of_measurement: "W"
+      device_class: power
+      unique_id: "sensor_livingroom_fan_power"
+    - name: "Living Room Fan Current"
+      state_topic: "zigbee2mqtt/living_room_fan"
+      value_template: "{{ value_json.current | default(0) }}"
+      unit_of_measurement: "A"
+      device_class: current
+      unique_id: "sensor_livingroom_fan_current"
+    - name: "Living Room Fan Voltage"
+      state_topic: "zigbee2mqtt/living_room_fan"
+      value_template: "{{ value_json.voltage | default(0) }}"
+      unit_of_measurement: "V"
+      device_class: voltage
+      unique_id: "sensor_livingroom_fan_voltage"
+    - name: "Living Room Fan Energy"
+      state_topic: "zigbee2mqtt/living_room_fan"
+      value_template: "{{ value_json.energy | default(0) }}"
+      unit_of_measurement: "kWh"
+      device_class: energy
+      state_class: total_increasing
+      unique_id: "sensor_livingroom_fan_energy"
+
+    # ── Tuya TS011F Power Monitoring — Living Room Air Purifier ────
+    - name: "Living Room Air Purifier Power"
+      state_topic: "zigbee2mqtt/living_room_air_purifier"
+      value_template: "{{ value_json.power | default(0) }}"
+      unit_of_measurement: "W"
+      device_class: power
+      unique_id: "sensor_livingroom_air_purifier_power"
+    - name: "Living Room Air Purifier Current"
+      state_topic: "zigbee2mqtt/living_room_air_purifier"
+      value_template: "{{ value_json.current | default(0) }}"
+      unit_of_measurement: "A"
+      device_class: current
+      unique_id: "sensor_livingroom_air_purifier_current"
+    - name: "Living Room Air Purifier Voltage"
+      state_topic: "zigbee2mqtt/living_room_air_purifier"
+      value_template: "{{ value_json.voltage | default(0) }}"
+      unit_of_measurement: "V"
+      device_class: voltage
+      unique_id: "sensor_livingroom_air_purifier_voltage"
+    - name: "Living Room Air Purifier Energy"
+      state_topic: "zigbee2mqtt/living_room_air_purifier"
+      value_template: "{{ value_json.energy | default(0) }}"
+      unit_of_measurement: "kWh"
+      device_class: energy
+      state_class: total_increasing
+      unique_id: "sensor_livingroom_air_purifier_energy"
 
   # ── Binary Sensors ───────────────────────────────────────────
   binary_sensor:
@@ -349,7 +439,7 @@ mqtt:
       unique_id: "switch_garden_pump"
       icon: mdi:water-pump
 
-    - name: "Garden Light"
+    - name: "Garden Light 2"
       command_topic: "home/garden/light/set"
       state_topic: "home/garden/light/state"
       payload_on: "ON"
@@ -359,7 +449,7 @@ mqtt:
       unique_id: "switch_garden_light"
       icon: mdi:outdoor-lamp
 
-    - name: "Garden Pathway Light"
+    - name: "Garden Light 1"
       command_topic: "home/garden/pathway/set"
       state_topic: "home/garden/pathway/state"
       payload_on: "ON"
@@ -368,6 +458,17 @@ mqtt:
       retain: true
       unique_id: "switch_garden_pathway"
       icon: mdi:outdoor-lamp
+
+    # ── Garden Lights ALL (Master toggle — ส่ง 1 message → ESP32 toggle 2 ดวงพร้อมกัน real-time) ──
+    - name: "Garden Lights"
+      command_topic: "home/garden/all/set"
+      state_topic: "home/garden/all/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: true       # UI update ทันที (ไม่รอ state confirm = smooth)
+      retain: false
+      unique_id: "switch_garden_lights_master"
+      icon: mdi:lightbulb-group
 
     # ── ESP32 #5 — โรงรถ ────────────────────────────────────────
     - name: "Garage Light"
@@ -389,6 +490,59 @@ mqtt:
       retain: true
       unique_id: "switch_garage_pathway"
       icon: mdi:outdoor-lamp
+
+    # ── Garage Lights ALL (Master toggle — ส่ง 1 msg → ESP32 toggle 2 ดวงพร้อมกัน real-time) ──
+    - name: "Garage Lights"
+      command_topic: "home/garage/all/set"
+      state_topic: "home/garage/all/state"
+      payload_on: "ON"
+      payload_off: "OFF"
+      optimistic: true
+      retain: false
+      unique_id: "switch_garage_lights_master"
+      icon: mdi:lightbulb-group
+
+    # ── Living Room — Tuya TS011F Zigbee Smart Plug #1: Fan ────
+    - name: "Living Room Fan"
+      command_topic: "zigbee2mqtt/living_room_fan/set"
+      state_topic: "zigbee2mqtt/living_room_fan"
+      payload_on: '{"state":"ON"}'
+      payload_off: '{"state":"OFF"}'
+      value_template: "{{ value_json.state }}"
+      state_on: "ON"
+      state_off: "OFF"
+      unique_id: "switch_livingroom_fan_zigbee"
+      icon: mdi:fan
+
+    # ── Living Room — Tuya TS011F Zigbee Smart Plug #2: Air Purifier ────
+    - name: "Living Room Air Purifier"
+      command_topic: "zigbee2mqtt/living_room_air_purifier/set"
+      state_topic: "zigbee2mqtt/living_room_air_purifier"
+      payload_on: '{"state":"ON"}'
+      payload_off: '{"state":"OFF"}'
+      value_template: "{{ value_json.state }}"
+      state_on: "ON"
+      state_off: "OFF"
+      unique_id: "switch_livingroom_air_purifier"
+      icon: mdi:air-purifier
+
+  # ── Locks (Lock domain — proper LOCK/UNLOCK semantic) ────────
+  lock:
+
+    # ── ESP32 #2 — ประตูหน้า (Servo SG90 180°, GPIO13, UNLOCK=0° LOCK=90°) ────
+    - name: "Front Door Lock"
+      command_topic: "home/livingroom/door/set"
+      state_topic: "home/livingroom/door/state"
+      payload_lock: "LOCK"
+      payload_unlock: "UNLOCK"
+      state_locked: "LOCKED"
+      state_unlocked: "UNLOCKED"
+      state_locking: "LOCKING"
+      state_unlocking: "UNLOCKING"
+      optimistic: true     # UI update ทันที (ไม่รอ state confirm 500ms = smooth)
+      retain: false
+      qos: 0
+      unique_id: "lock_front_door"
 
   # ── Covers ───────────────────────────────────────────────────
   cover:
@@ -442,7 +596,206 @@ input_select:
     icon: mdi:sofa
 
 # ─── Automations ─────────────────────────────────────────────
-automation:
+
+# ─── 🎆 Light Effects Scripts (callable from automation / LINE / Alexa) ────
+script:
+
+  # ── 🚨 ชาวี Intrusion Response — verbal "มีคนบุก!" trigger ──
+  reset_normal:
+    alias: "🔄 Reset / กลับสู่ปกติ (หยุดทุกซีน/สัญญาณ)"
+    description: "Kill switch: stop party loop + alert flash + reset light warm white"
+    mode: restart
+    sequence:
+      - service: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.party_loop_active
+            - input_boolean.alert_flash_active
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data: { effect: stop_colorloop }
+      - delay: "00:00:01"
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data: { color_temp_kelvin: 3000, brightness_pct: 80 }
+  chavee_intrusion_response:
+    alias: "🚨 ชาวี Intrusion Response"
+    description: "ตอบสนองรวม: ล็อค + Security + flash + LINE — เรียกจาก ชาวี"
+    mode: restart
+    sequence:
+      - service: lock.lock
+        target: { entity_id: lock.front_door_lock }
+      - service: input_select.select_option
+        target: { entity_id: input_select.house_mode }
+        data: { option: "Security" }
+      - service: script.living_room_red_flash
+      - service: rest_command.send_alert
+        data:
+          alert_type: "intrusion_verbal"
+          value: "ผู้ใช้แจ้งบุกรุก!"
+          room: "house"
+
+  # ── 🚨 Red flash alarm (gas / smoke alert) ──
+  living_room_red_flash:
+    alias: "🚨 Living Room - Red Flash"
+    description: "กระพริบแดง 6 ครั้ง แล้วกลับเป็นขาวอุ่น"
+    mode: restart
+    sequence:
+      - repeat:
+          count: 6
+          sequence:
+            - service: light.turn_on
+              target: { entity_id: light.living_room_light }
+              data:
+                rgb_color: [255, 30, 30]
+                brightness: 254
+                transition: 0.2
+            - delay: "00:00:00.7"
+            - service: light.turn_on
+              target: { entity_id: light.living_room_light }
+              data:
+                rgb_color: [80, 0, 0]
+                brightness: 30
+                transition: 0.2
+            - delay: "00:00:00.5"
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          color_temp_kelvin: 2700
+          brightness: 200
+          transition: 1.5
+
+  # ── 💧 Blue pulse (water leak alert) ──
+  living_room_blue_pulse:
+    alias: "💧 Living Room - Blue Pulse"
+    description: "หายใจสีฟ้า 8 ครั้ง แล้วกลับเดิม"
+    mode: restart
+    sequence:
+      - repeat:
+          count: 8
+          sequence:
+            - service: light.turn_on
+              target: { entity_id: light.living_room_light }
+              data:
+                rgb_color: [40, 120, 255]
+                brightness: 254
+                transition: 0.4
+            - delay: "00:00:00.8"
+            - service: light.turn_on
+              target: { entity_id: light.living_room_light }
+              data:
+                rgb_color: [20, 60, 180]
+                brightness: 40
+                transition: 0.4
+            - delay: "00:00:00.6"
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          color_temp_kelvin: 2700
+          brightness: 200
+          transition: 1.5
+
+  # ── 🌅 Sunrise (15 min fade up) ──
+  living_room_sunrise:
+    alias: "🌅 Sunrise Wake-up"
+    description: "ค่อยๆ สว่างจากดำ → แสงเช้า 15 นาที"
+    mode: single
+    sequence:
+      # Stage 1: deep red, very dim (1 min)
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          rgb_color: [180, 40, 20]
+          brightness: 8
+          transition: 5
+      - delay: "00:02:30"
+      # Stage 2: orange (3 min)
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          rgb_color: [255, 130, 50]
+          brightness: 60
+          transition: 60
+      - delay: "00:02:30"
+      # Stage 3: bright orange (3 min)
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          rgb_color: [255, 180, 90]
+          brightness: 130
+          transition: 60
+      - delay: "00:02:30"
+      # Stage 4: warm white (3 min)
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          color_temp_kelvin: 3200
+          brightness: 190
+          transition: 60
+      - delay: "00:02:30"
+      # Stage 5: cool morning white (final)
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          color_temp_kelvin: 5500
+          brightness: 254
+          transition: 90
+
+  # ── 🎉 Party mode ON ──
+  living_room_party_on:
+    alias: "🎉 Party Mode ON"
+    description: "Color loop + พัดลม + brightness max"
+    mode: single
+    sequence:
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          brightness: 254
+          effect: colorloop
+
+  # ── 🛑 Party mode OFF ──
+  living_room_party_off:
+    alias: "🛑 Party Mode OFF"
+    description: "หยุด colorloop กลับเป็นไฟปกติ"
+    mode: single
+    sequence:
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          effect: stop_colorloop
+      - delay: "00:00:00.5"
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          color_temp_kelvin: 2700
+          brightness: 200
+          transition: 2
+
+  # ── 🏠 Welcome home (10s color loop → settle warm) ──
+  living_room_welcome_home:
+    alias: "🏠 Welcome Home"
+    description: "ทักทายกลับบ้าน — colorloop 8 วิ → ขาวอุ่น"
+    mode: single
+    sequence:
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          brightness: 254
+          effect: colorloop
+      - delay: "00:00:08"
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          effect: stop_colorloop
+      - delay: "00:00:00.5"
+      - service: light.turn_on
+        target: { entity_id: light.living_room_light }
+        data:
+          color_temp_kelvin: 2700
+          brightness: 230
+          transition: 3
+
+automation manual:
 
   # ── Away Mode: ปิดอุปกรณ์ทุกตัวเมื่อออกจากบ้าน ──────────────
   - alias: "Away Mode - Turn Off All Devices"
@@ -462,15 +815,15 @@ automation:
             - switch.kitchen_stove
             - switch.bathroom_light
             - switch.garden_water_pump
-            - switch.garden_light
-            - switch.garden_pathway_light
+            - switch.garden_light_2
+            - switch.garden_light_1
             - switch.garage_light
             - switch.garage_pathway_light
-            - switch.livingroom_fan_plug
-            - switch.livingroom_purifier_plug
+            - switch.living_room_fan
+            - switch.living_room_air_purifier
       - service: light.turn_off
         target:
-          entity_id: light.livingroom_rgbw
+          entity_id: light.living_room_light
 
   # ── Security Mode: ปิดทุกอย่าง + ปิดประตูโรงรถ ──────────────
   - alias: "Security Mode - Turn Off All Devices"
@@ -490,15 +843,15 @@ automation:
             - switch.kitchen_stove
             - switch.bathroom_light
             - switch.garden_water_pump
-            - switch.garden_light
-            - switch.garden_pathway_light
+            - switch.garden_light_2
+            - switch.garden_light_1
             - switch.garage_light
             - switch.garage_pathway_light
-            - switch.livingroom_fan_plug
-            - switch.livingroom_purifier_plug
+            - switch.living_room_fan
+            - switch.living_room_air_purifier
       - service: light.turn_off
         target:
-          entity_id: light.livingroom_rgbw
+          entity_id: light.living_room_light
       - service: cover.close_cover
         target:
           entity_id: cover.garage_door
@@ -517,14 +870,12 @@ automation:
             - switch.bedroom_light
             - switch.kitchen_light
             - switch.bathroom_light
-            - switch.garden_light
-            - switch.garden_pathway_light
+            - switch.garden_light_2
+            - switch.garden_light_1
             - switch.garage_light
-            - switch.livingroom_fan_plug
-            - switch.livingroom_purifier_plug
-      - service: light.turn_off
-        target:
-          entity_id: light.livingroom_rgbw
+            - switch.living_room_fan
+            - switch.living_room_air_purifier
+      # NOTE: light.living_room_light ตัดออก — Mode Scene automation จัดการแทน (dim warm orange)
       - service: cover.close_cover
         target:
           entity_id: cover.bedroom_curtain
@@ -540,6 +891,8 @@ automation:
         for:
           minutes: 1
     action:
+      # 🚨 NEW: flash red on living_room_light
+      - service: script.living_room_red_flash
       - service: switch.turn_on
         target:
           entity_id: switch.kitchen_fan
@@ -562,6 +915,8 @@ automation:
         for:
           minutes: 1
     action:
+      # 💧 NEW: blue pulse on living_room_light
+      - service: script.living_room_blue_pulse
       - service: rest_command.send_alert
         data:
           alert_type: "water_leak"
@@ -589,18 +944,45 @@ automation:
 
   # ── Bathroom Fall Alert: แจ้ง LINE ──────────────────────────
   - alias: "Bathroom Fall Alert - LINE Alert"
-    description: "เมื่อ LD2410 ตรวจพบการล้มในห้องน้ำ แจ้ง LINE ทันที"
+    description: "เมื่อ LD2410 ตรวจพบการล้มในห้องน้ำ แจ้ง LINE + ไฟกระพริบแดง 30s"
     mode: single
     trigger:
       - platform: state
         entity_id: binary_sensor.bathroom_fall_alert
         to: "on"
     action:
+      # 1. ยิง LINE alert ทันที (priority)
       - service: rest_command.send_alert
         data:
           alert_type: "fall_alert"
           value: "detected"
           room: "bathroom"
+      # 2. เก็บ state เดิมของไฟห้องนั่งเล่นก่อนกระพริบ
+      - service: scene.create
+        data:
+          scene_id: livingroom_pre_fall_alert
+          snapshot_entities:
+            - light.living_room_light
+      # 3. ไฟกระพริบแดง 15 รอบ (30 วินาที) — Tuya TS0505B ไม่ support flash effect จึง loop เอง
+      - repeat:
+          count: 15
+          sequence:
+            - service: light.turn_on
+              target:
+                entity_id: light.living_room_light
+              data:
+                brightness: 255
+                rgb_color: [255, 0, 0]
+            - delay: "00:00:01"
+            - service: light.turn_off
+              target:
+                entity_id: light.living_room_light
+            - delay: "00:00:01"
+      # 4. คืนสถานะไฟห้องนั่งเล่นเหมือนก่อนเกิด alert
+      - service: scene.turn_on
+        target:
+          entity_id: scene.livingroom_pre_fall_alert
+      # 5. หน่วง 5 นาทีกัน trigger ซ้ำ
       - delay:
           minutes: 5
 
@@ -615,6 +997,8 @@ automation:
         for:
           minutes: 1
     action:
+      # 🚨 NEW: flash red on living_room_light (also for garage smoke)
+      - service: script.living_room_red_flash
       - service: rest_command.send_alert
         data:
           alert_type: "smoke_alert"
@@ -688,15 +1072,15 @@ automation:
             - switch.bedroom_light
             - switch.kitchen_light
             - switch.bathroom_light
-            - switch.garden_light
-            - switch.garden_pathway_light
+            - switch.garden_light_2
+            - switch.garden_light_1
             - switch.garage_light
             - switch.garage_pathway_light
-            - switch.livingroom_fan_plug
-            - switch.livingroom_purifier_plug
+            - switch.living_room_fan
+            - switch.living_room_air_purifier
       - service: light.turn_off
         target:
-          entity_id: light.livingroom_rgbw
+          entity_id: light.living_room_light
       - service: rest_command.send_alert
         data:
           alert_type: "lights_off_night"
@@ -713,7 +1097,7 @@ automation:
       - service: switch.turn_on
         target:
           entity_id: switch.garden_water_pump
-      - delay: "00:10:00"
+      - delay: "00:00:10"
       - service: switch.turn_off
         target:
           entity_id: switch.garden_water_pump
@@ -756,6 +1140,8 @@ automation:
         entity_id: person.athit_boonpinit
         to: "home"
     action:
+      # 🏠 NEW: welcome home light show
+      - service: script.living_room_welcome_home
       - service: input_select.select_option
         target:
           entity_id: input_select.house_mode
@@ -767,13 +1153,173 @@ automation:
           value: "home"
           room: "all"
 
+
+  # ─── 🎨 ไฟห้องนั่งเล่นเปลี่ยนสีตามโหมด (Tuya Zigbee RGB+CCT) ──────
+  - alias: "🎨 Living Room Light - Mode Scene"
+    description: "เปลี่ยนสี/ความสว่าง light.living_room_light ตาม house_mode + comfort_mode"
+    trigger:
+      - platform: state
+        entity_id: input_select.comfort_mode
+      - platform: state
+        entity_id: input_select.house_mode
+    action:
+      - choose:
+          # ── HOUSE MODE: Away → ปิดไฟเลย (priority สูงสุด) ──
+          - conditions:
+              - condition: state
+                entity_id: input_select.house_mode
+                state: "Away"
+            sequence:
+              - service: light.turn_off
+                target:
+                  entity_id: light.living_room_light
+          # ── HOUSE MODE: Security → สีแดง dim ──
+          - conditions:
+              - condition: state
+                entity_id: input_select.house_mode
+                state: "Security"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: light.living_room_light
+                data:
+                  rgb_color: [220, 40, 40]
+                  brightness: 178
+                  transition: 2
+          # ── COMFORT: Sleep → ส้มอุ่น dim สุด ──
+          - conditions:
+              - condition: state
+                entity_id: input_select.comfort_mode
+                state: "Sleep"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: light.living_room_light
+                data:
+                  color_temp_kelvin: 2200
+                  brightness: 25
+                  transition: 3
+          # ── COMFORT: Relax → ฟ้าผ่อนคลาย ──
+          - conditions:
+              - condition: state
+                entity_id: input_select.comfort_mode
+                state: "Relax"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: light.living_room_light
+                data:
+                  rgb_color: [100, 170, 220]
+                  brightness: 153
+                  transition: 3
+          # ── COMFORT: Warm → เหลืองอำพันอบอุ่น ──
+          - conditions:
+              - condition: state
+                entity_id: input_select.comfort_mode
+                state: "Warm"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: light.living_room_light
+                data:
+                  color_temp_kelvin: 2400
+                  brightness: 217
+                  transition: 3
+          # ── COMFORT: Normal + HOUSE: Home → ขาวอุ่นต้อนรับ ──
+          - conditions:
+              - condition: state
+                entity_id: input_select.comfort_mode
+                state: "Normal"
+              - condition: state
+                entity_id: input_select.house_mode
+                state: "Home"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: light.living_room_light
+                data:
+                  color_temp_kelvin: 2700
+                  brightness: 240
+                  transition: 2
+
+
+  # ─── 🌅 Daily Sunrise (06:00) — DISABLED by default ───────────────
+  - alias: "🌅 Daily Sunrise Wake-up at 06:00"
+    description: "ถ้าอยู่บ้าน + ไม่ใช่ Sleep mode → start sunrise sequence (15 min)"
+    initial_state: false  # ปิดไว้ก่อน เปิดผ่าน HA UI เมื่อพร้อม
+    trigger:
+      - platform: time
+        at: "06:00:00"
+    condition:
+      - condition: state
+        entity_id: input_select.house_mode
+        state: "Home"
+    action:
+      - service: script.living_room_sunrise
+
 # ─── REST Commands (เรียก n8n Alert) ─────────────────────────
+
+  # ── 🚨 ประตูหน้าเปิดตอนไม่อยู่บ้าน (Security/Away) → red flash + LINE alert ──
+  - alias: 'Front Door Intrusion Alert'
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.front_door
+        to: 'on'
+    condition:
+      - condition: state
+        entity_id: input_select.house_mode
+        state:
+          - 'Away'
+          - 'Security'
+    action:
+      - service: script.living_room_red_flash
+      - service: rest_command.send_alert
+        data:
+          alert_type: 'intrusion'
+          value: 'ประตูหน้าเปิดขณะไม่อยู่บ้าน!'
 rest_command:
   send_alert:
-    url: "https://YOUR_N8N_INSTANCE.up.railway.app/webhook/smart-home-alert"
+    url: "https://n8n-production-ae58.up.railway.app/webhook/smart-home-alert"
     method: POST
     content_type: "application/json"
     payload: '{"alert_type":"{{ alert_type }}","value":"{{ value }}","room":"{{ room }}"}'
+
+  # ═══ ChAvee Bypass — Anthropic + LINE Reply ═══
+  ask_anthropic:
+    url: "https://api.anthropic.com/v1/messages"
+    method: POST
+    headers:
+      x-api-key: !secret anthropic_key
+      anthropic-version: "2023-06-01"
+      content-type: "application/json"
+    payload: >-
+      {"model":"claude-haiku-4-5","max_tokens":1024,"system":"คุณคือ ชาวี (ChAvee) ผู้ช่วยสมาร์ทโฮมประจำบ้านของคุณมอส เรียกตัวเองว่า 'ผม' พูดไทยเป็นกันเองแบบเพื่อนสนิท สุภาพ ลงท้าย ครับ ตอบสั้นกระชับ 1-2 ประโยค และ proactive แนะนำสิ่งที่เกี่ยวข้องเมื่อเหมาะสม\nกติกาเหล็ก: ตอบเป็น raw JSON เท่านั้น ห้ามใช้ markdown ห้ามมี ``` เด็ดขาด format: {\"reply_th\":\"คำตอบไทย\",\"intent\":\"control|chat|status\",\"haActions\":[{\"service\":\"domain/service\",\"body\":{\"entity_id\":\"...\"}}]} — haActions เป็น array ใส่ได้หลาย action, ใส่ [] ถ้าไม่ต้องสั่งงาน\nสั่งได้หลาย action พร้อมกันในครั้งเดียว — ใส่ทุกอย่างที่ผู้ใช้ขอลงใน haActions เลย (เช่น เปิดไฟกับพัดลม=2 actions, เปิดทุกอย่าง=ใส่ครบทุกตัว) ห้ามบอกให้สั่งทีละอย่าง\nระบบจะแนบบทสนทนาก่อนหน้ามาให้ — ใช้เข้าใจบริบทต่อเนื่อง (เช่นถ้าผู้ใช้พูด เปิดมาก็ได้ หรือ ปิดมัน ให้อ้างอิงสิ่งที่คุยกันก่อนหน้า) และเรียนรู้พฤติกรรมเจ้าของบ้าน\nถ้าข้อความมีคำว่า ALEXA USER SAID ให้ตอบ reply_th เป็นภาษาอังกฤษสั้นๆ กระชับ (สำหรับ Alexa voice) ไม่ใส่ emoji\nความจริงของบ้านนี้: ไม่มีเตอร์โมสตัท ไม่มีแอร์ ไม่มี Spotify/เพลง ไม่มีทีวีอัจฉริยะ — ห้ามเสนอหรืออ้างถึงอุปกรณ์ที่ไม่มี ถ้าถูกขอให้บอกตรงๆ ว่าบ้านเราไม่มี แล้วแนะนำสิ่งที่มีแทน ถ้าค่าสถานะเป็น unknown/unavailable แปลว่าอุปกรณ์นั้นยังไม่ออนไลน์ (hardware ช่วงนี้ยังไม่เสียบครบ) ให้บอกตามตรง\n\nอุปกรณ์ที่สั่งได้ (entity จริง):\n- light.living_room_light (หลอด Tuya RGB+CCT 16 ล้านสี เปลี่ยนสี/อุณหภูมิแสงได้)\n- switch.bedroom_light, switch.kitchen_light, switch.bathroom_light (ไฟห้องนอน/ครัว/น้ำ)\n- switch.living_room_fan, switch.bedroom_fan, switch.kitchen_fan (พัดลม)\n- switch.living_room_air_purifier (เครื่องฟอกอากาศ)\n- switch.garden_water_pump (ปั๊มรดน้ำสวน), switch.garage_light, switch.garage_pathway_light\n- cover.garage_door (ประตูโรงรถ), cover.bedroom_curtain (ม่านห้องนอน)\n- lock.front_door_lock (ล็อคประตูหน้า)\n- input_select.house_mode (Home/Away/Security), input_select.comfort_mode (Normal/Relax/Warm/Sleep)\n- ซีนไฟ (เรียกผ่าน script/turn_on): script.living_room_party_on (ปาร์ตี้), script.living_room_party_off, script.living_room_sunrise (แสงเช้า), script.living_room_welcome_home (ต้อนรับ), script.living_room_blue_pulse (ฟ้าสงบ), script.living_room_red_flash (แดงเตือน), script.reset_normal (หยุดทุกซีน/กลับไฟปกติ/ปิดไฟกระพริบเตือน)\n\nตัวอย่าง (haActions เป็น array เสมอ):\n- เปิดไฟห้องนั่งเล่น → haActions=[{\"service\":\"light/turn_on\",\"body\":{\"entity_id\":\"light.living_room_light\"}}]\n- เปิดไฟห้องนอนกับพัดลมห้องนอน → haActions=[{\"service\":\"switch/turn_on\",\"body\":{\"entity_id\":\"switch.bedroom_light\"}},{\"service\":\"switch/turn_on\",\"body\":{\"entity_id\":\"switch.bedroom_fan\"}}]\n- เปิดทุกอย่างในบ้าน → ใส่ไฟและพัดลมทุกห้องลงใน haActions ให้ครบทุกตัว\n- ไฟสีฟ้า → haActions=[{\"service\":\"light/turn_on\",\"body\":{\"entity_id\":\"light.living_room_light\",\"rgb_color\":[60,140,255]}}]\n- เปิดโหมดปาร์ตี้ → haActions=[{\"service\":\"script/turn_on\",\"body\":{\"entity_id\":\"script.living_room_party_on\"}}]\n- หยุด/กลับปกติ/ปิดสัญญาณเตือน → haActions=[{\"service\":\"script/turn_on\",\"body\":{\"entity_id\":\"script.reset_normal\"}}]\n- เปิดประตูโรงรถ → haActions=[{\"service\":\"cover/open_cover\",\"body\":{\"entity_id\":\"cover.garage_door\"}}]\n- ล็อคประตู → haActions=[{\"service\":\"lock/lock\",\"body\":{\"entity_id\":\"lock.front_door_lock\"}}]\n- โหมด away → haActions=[{\"service\":\"input_select/select_option\",\"body\":{\"entity_id\":\"input_select.house_mode\",\"option\":\"Away\"}}]\n- ถามอุณหภูมิ/สถานะ → intent=status, haActions=[] แล้วตอบจากสถานะสดด้านล่าง\n\nสถานะสด ณ ตอนนี้ (อัพเดททุกครั้งที่ถาม):\nห้องนอน {{ states('sensor.bedroom_temperature') }}C/{{ states('sensor.bedroom_humidity') }}% · นั่งเล่น {{ states('sensor.living_room_temperature') }}C/{{ states('sensor.living_room_humidity') }}% · ครัว {{ states('sensor.kitchen_temperature') }}C/{{ states('sensor.kitchen_humidity') }}%\nแก๊สครัว LPG: {{ states('sensor.kitchen_gas_lpg') }} (alert: {{ states('binary_sensor.kitchen_gas_alert') }}) · คุณภาพอากาศ: {{ states('sensor.living_room_air_quality') }} · ดินสวน: {{ states('sensor.garden_soil_moisture') }}%\nประตูหน้า: {{ states('binary_sensor.front_door') }} · ล็อค: {{ states('lock.front_door_lock') }} · น้ำรั่วห้องน้ำ: {{ states('binary_sensor.bathroom_water_leak') }} · คนในห้องนอน: {{ states('binary_sensor.bedroom_presence') }}\nไฟนั่งเล่น: {{ states('light.living_room_light') }} · ม่านห้องนอน: {{ states('cover.bedroom_curtain') }} · ประตูโรงรถ: {{ states('cover.garage_door') }}\nโหมดบ้าน: {{ states('input_select.house_mode') }} · comfort: {{ states('input_select.comfort_mode') }}","messages":[{"role":"user","content":"{{ user_msg }}"}]}
+
+  chavee_line_reply:
+    url: "https://api.line.me/v2/bot/message/reply"
+    method: POST
+    headers:
+      Authorization: !secret line_bearer
+      Content-Type: "application/json"
+    payload: '{"replyToken":"{{ reply_token }}","messages":[{"type":"text","text":"{{ text }}"}]}'
+
+  log_chat_supabase:
+    url: "https://absdqczsxcetgepgefpo.supabase.co/rest/v1/chat_logs"
+    method: POST
+    headers:
+      apikey: !secret supabase_key
+      Authorization: !secret supabase_bearer
+      Prefer: "return=minimal"
+    content_type: "application/json"
+    payload: '{"user_id":"{{ user_id }}","message":"{{ msg }}","reply":"{{ reply }}","intent":"{{ intent }}"}'
+
+  get_chat_history:
+    url: "https://absdqczsxcetgepgefpo.supabase.co/rest/v1/chat_logs?user_id=eq.{{ uid }}&order=id.desc&limit=6&select=message,reply"
+    method: GET
+    headers:
+      apikey: !secret supabase_key
+      Authorization: !secret supabase_bearer
+
 
 # ─── Recorder / History ──────────────────────────────────────
 recorder:
@@ -786,3 +1332,5 @@ recorder:
       - input_select
       - automation
       - cover
+# 🆕 25 พ.ค. 2569 — load UI-managed automations from automations.yaml
+automation ui: !include automations.yaml

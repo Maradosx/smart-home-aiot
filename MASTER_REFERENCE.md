@@ -7,6 +7,8 @@
 > **Defense:** ✅ **26 พ.ค. 2569 — PASSED "ไปได้ด้วยดีเลยครับ"** 🎓
 > **Status:** Production-Ready + Battle-tested
 > **Doc version:** 2.0 (27 พ.ค. 2569 — Deep explanations added)
+>
+> 🔄 **Latest update — 23 มิ.ย. 2026:** ชาวี AI รองรับ **multi-action** (สั่งหลายอย่างพร้อมกัน) + **conversation memory** (อ่านประวัติจาก Supabase `chat_logs` → คุยต่อเนื่องเข้าใจบริบท) · **Behavioral audit 15 จุด** — manual-override ไฟ (ไม่เด้งตอนนอน), โรงรถปิด+ล็อกประตูตอน Away, พัดลม hysteresis, GPS debounce, AI kill-switch scene (reset_normal) · live: **244 entities · 79 automations (71 on) · 8 scripts**
 
 ---
 

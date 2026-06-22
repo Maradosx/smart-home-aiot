@@ -1,0 +1,1021 @@
+title: Smart Home AIoT
+views:
+
+  # ════════════════════════════════════════════════════════════
+  # 1. หน้าหลัก / Overview
+  # ════════════════════════════════════════════════════════════
+  - title: ภาพรวม
+    path: overview
+    icon: mdi:home-automation
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              # 🏠 Smart Home AIoT
+              **ชาวี (Chawi)** — ผู้ช่วยบ้านอัจฉริยะ AI ภาษาไทย
+
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                title: 🎛️ Mode Control
+                show_header_toggle: false
+                entities:
+                  - entity: input_select.house_mode
+                    name: House Mode
+                  - entity: input_select.comfort_mode
+                    name: Comfort Mode
+              - type: weather-forecast
+                entity: weather.forecast_baan
+                show_forecast: true
+
+          - type: entities
+            title: 🚨 Active Alerts
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.kitchen_gas_alert
+                name: แจ้งแก๊สรั่ว / Gas Alert
+              - entity: binary_sensor.bathroom_water_leak
+                name: น้ำรั่ว / Water Leak
+              - entity: binary_sensor.bathroom_fall_alert
+                name: คนล้มห้องน้ำ / Bathroom Fall
+              - entity: binary_sensor.bedroom_fall_alert
+                name: คนล้มห้องนอน / Bedroom Fall
+              - entity: binary_sensor.living_room_air_alert
+                name: อากาศเสีย / Air Alert
+              - entity: binary_sensor.garage_smoke_alert
+                name: ควัน/แก๊สโรงรถ / Garage Smoke
+              - entity: binary_sensor.front_door
+                name: ประตูหน้า / Front Door
+
+          - type: glance
+            title: 🌡️ Temperature ทุกห้อง
+            show_state: true
+            columns: 4
+            entities:
+              - entity: sensor.bedroom_temperature
+                name: ห้องนอน
+              - entity: sensor.living_room_temperature
+                name: ห้องนั่งเล่น
+              - entity: sensor.kitchen_temperature
+                name: ครัว
+              - entity: weather.forecast_baan
+                name: ภายนอก
+
+          - type: glance
+            title: 💧 Humidity ทุกห้อง
+            show_state: true
+            columns: 4
+            entities:
+              - entity: sensor.bedroom_humidity
+                name: ห้องนอน
+              - entity: sensor.living_room_humidity
+                name: ห้องนั่งเล่น
+              - entity: sensor.kitchen_humidity
+                name: ครัว
+              - entity: sensor.garden_soil_moisture
+                name: ดินสวน
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: 💡 Lights ทั้งหมด (quick toggle)
+            show_header_toggle: true
+            entities:
+              - entity: switch.bedroom_light
+                name: ห้องนอน
+              - entity: light.living_room_light
+                name: ห้องนั่งเล่น (Zigbee)
+              - entity: switch.kitchen_light
+                name: ครัว
+              - entity: switch.bathroom_light
+                name: ห้องน้ำ
+              - entity: switch.garden_light_1
+                name: สวน 1
+              - entity: switch.garden_light_2
+                name: สวน 2
+              - entity: switch.garage_light
+                name: โรงรถ
+              - entity: switch.garage_pathway_light
+                name: ทางเดิน
+
+          - type: entities
+            title: 🌪️ Fans + Pumps
+            show_header_toggle: false
+            entities:
+              - entity: switch.bedroom_fan
+                name: พัดลมห้องนอน
+              - entity: switch.living_room_air_purifier
+                name: เครื่องฟอกอากาศ (รอ Tuya plug #2)
+                icon: mdi:air-purifier
+                secondary_info: last-updated
+              - type: section
+                label: ── พัดลม ──
+              - entity: switch.living_room_fan
+                name: พัดลมห้องนั่งเล่น
+              - entity: switch.kitchen_fan
+                name: พัดลมระบายอากาศครัว
+              - entity: switch.kitchen_stove
+                name: เตาแก๊ส
+              - entity: switch.garden_water_pump
+                name: ปั๊มรดน้ำ
+
+          - type: entities
+            title: 🚪 Doors + Covers
+            entities:
+              - entity: cover.bedroom_curtain
+                name: ม่านห้องนอน
+              - entity: cover.garage_door
+                name: ประตูโรงรถ
+              - entity: lock.front_door_lock
+                name: ล็อคประตูหน้า
+
+          - type: entities
+            title: 📡 Zigbee Bridge
+            entities:
+              - entity: binary_sensor.zigbee2mqtt_bridge_connection_state
+                name: Connection
+              - entity: sensor.zigbee2mqtt_bridge_version
+                name: Z2M Version
+              - entity: switch.zigbee2mqtt_bridge_permit_join
+                name: Permit Join
+
+  # ════════════════════════════════════════════════════════════
+  # 2. ห้องนอน / Bedroom
+  # ════════════════════════════════════════════════════════════
+  - title: ห้องนอน
+    path: bedroom
+    icon: mdi:bed
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              ## 🛏️ ห้องนอน / Bedroom
+              ESP32 #1 — DHT22 + LD2410C mmWave + Servo + LDR + LED + Relay Fan
+
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.bedroom_temperature
+                name: อุณหภูมิ
+                unit: °C
+                min: 15
+                max: 40
+                severity:
+                  green: 22
+                  yellow: 28
+                  red: 32
+              - type: gauge
+                entity: sensor.bedroom_humidity
+                name: ความชื้น
+                unit: '%'
+                min: 0
+                max: 100
+                severity:
+                  green: 40
+                  yellow: 60
+                  red: 75
+
+          - type: entities
+            title: 👤 Presence & Motion
+            entities:
+              - entity: binary_sensor.bedroom_presence
+                name: คนอยู่ในห้อง (mmWave)
+              - entity: binary_sensor.bedroom_presence
+                name: การเคลื่อนไหว
+              - entity: binary_sensor.bedroom_fall_alert
+                name: แจ้งคนล้ม
+              - entity: sensor.bedroom_ldr
+                name: ระดับแสง
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: 💡 Actuators
+            show_header_toggle: false
+            entities:
+              - entity: switch.bedroom_light
+                name: ไฟห้องนอน
+                icon: mdi:lightbulb
+              - entity: switch.bedroom_fan
+                name: พัดลม
+                icon: mdi:fan
+              - entity: cover.bedroom_curtain
+                name: ผ้าม่าน
+                icon: mdi:curtains
+
+  # ════════════════════════════════════════════════════════════
+  # 3. ห้องนั่งเล่น / Living Room
+  # ════════════════════════════════════════════════════════════
+  - title: ห้องนั่งเล่น
+    path: living-room
+    icon: mdi:sofa
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              ## 🛋️ ห้องนั่งเล่น / Living Room
+              ESP32 #2 — DHT22 + MQ-135 + LDR
+              **Zigbee:** Tuya RGB+CCT bulb + Tuya plug ×2 + SNZB-03P motion
+
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.living_room_temperature
+                name: อุณหภูมิ
+                unit: °C
+                min: 15
+                max: 40
+                severity:
+                  green: 22
+                  yellow: 28
+                  red: 32
+              - type: gauge
+                entity: sensor.living_room_humidity
+                name: ความชื้น
+                unit: '%'
+                min: 0
+                max: 100
+                severity:
+                  green: 40
+                  yellow: 60
+                  red: 75
+
+          - type: entities
+            title: 🌬️ Air Quality
+            entities:
+              - entity: sensor.living_room_air_quality
+                name: คุณภาพอากาศ
+              - entity: binary_sensor.living_room_air_alert
+                name: แจ้งอากาศเสีย
+              - entity: sensor.living_room_ldr
+                name: ระดับแสง
+              - entity: binary_sensor.living_room_motion
+                name: การเคลื่อนไหว (Zigbee)
+
+      - type: vertical-stack
+        cards:
+          - type: light
+            entity: light.living_room_light
+            name: ไฟห้องนั่งเล่น (Tuya RGB+CCT)
+
+          - type: entities
+            title: 🔌 Smart Plugs (Zigbee)
+            show_header_toggle: false
+            entities:
+              - entity: switch.living_room_air_purifier
+                name: เครื่องฟอกอากาศ (รอ Tuya plug #2)
+                icon: mdi:air-purifier
+                secondary_info: last-updated
+              - type: section
+                label: ── พัดลม ──
+              - entity: switch.living_room_fan
+                name: พัดลม
+                icon: mdi:fan
+              - type: section
+                label: Power Monitoring (พัดลม)
+              - entity: sensor.living_room_fan_power
+                name: Power
+              - entity: sensor.living_room_fan_voltage
+                name: Voltage
+              - entity: sensor.living_room_fan_current
+                name: Current
+              - entity: sensor.living_room_fan_energy
+                name: Energy
+
+          # ─── Front Door Lock (SG90 180° servo บน ESP32 #2 / GPIO13) ───
+          - type: markdown
+            content: |
+              ## 🚪 ประตูหน้า / Front Door Lock
+              _SG90 servo 180° บน ESP32 #2 (GPIO13) · UNLOCK=0° ↔ LOCK=90°_
+
+          - type: horizontal-stack
+            cards:
+              - type: button
+                entity: lock.front_door_lock
+                name: ล็อคประตู
+                icon: mdi:lock
+                icon_height: 48px
+                show_state: false
+                tap_action:
+                  action: call-service
+                  service: lock.lock
+                  service_data:
+                    entity_id: lock.front_door_lock
+                hold_action:
+                  action: more-info
+
+              - type: button
+                entity: lock.front_door_lock
+                name: ปลดล็อค
+                icon: mdi:lock-open-variant
+                icon_height: 48px
+                show_state: false
+                tap_action:
+                  action: call-service
+                  service: lock.unlock
+                  service_data:
+                    entity_id: lock.front_door_lock
+                hold_action:
+                  action: more-info
+
+          - type: entities
+            title: 🔐 สถานะประตู
+            show_header_toggle: false
+            entities:
+              - entity: lock.front_door_lock
+                name: สถานะล็อค
+                icon: mdi:door
+              - entity: binary_sensor.front_door
+                name: ประตูเปิด/ปิด (Zigbee DS01)
+                icon: mdi:door-closed
+
+          - type: markdown
+            content: |
+              ## 🎆 Light Effects
+              **🟢 Auto-trigger** = ทำงานเอง · **⚪ Manual** = ต้องกดเอง
+              สถานะ **ON** = กำลังทำงาน · **OFF** = ว่าง · tap card = trigger ทันที
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              # ── Red Flash (auto on gas/smoke) ──
+              - type: tile
+                entity: script.living_room_red_flash
+                name: 🚨 Red Flash
+                color: red
+                tap_action:
+                  action: call-service
+                  service: script.living_room_red_flash
+                features_position: bottom
+                vertical: false
+                hide_state: false
+                state_content:
+                  - state
+                  - last-triggered
+                icon: mdi:alert-circle-outline
+
+              # ── Blue Pulse (auto on water leak) ──
+              - type: tile
+                entity: script.living_room_blue_pulse
+                name: 💧 Blue Pulse
+                color: blue
+                tap_action:
+                  action: call-service
+                  service: script.living_room_blue_pulse
+                state_content:
+                  - state
+                  - last-triggered
+                icon: mdi:water-pump
+
+              # ── Welcome Home (auto on GPS) ──
+              - type: tile
+                entity: script.living_room_welcome_home
+                name: 🏠 Welcome Home
+                color: amber
+                tap_action:
+                  action: call-service
+                  service: script.living_room_welcome_home
+                state_content:
+                  - state
+                  - last-triggered
+                icon: mdi:home-heart
+
+              # ── Sunrise (auto 06:00) ──
+              - type: tile
+                entity: script.living_room_sunrise
+                name: 🌅 Sunrise
+                color: orange
+                tap_action:
+                  action: call-service
+                  service: script.living_room_sunrise
+                state_content:
+                  - state
+                  - last-triggered
+                icon: mdi:weather-sunset-up
+
+              # ── Party ON (manual) ──
+              - type: tile
+                entity: script.living_room_party_on
+                name: 🎉 Party ON
+                color: pink
+                tap_action:
+                  action: call-service
+                  service: script.living_room_party_on
+                state_content:
+                  - state
+                  - last-triggered
+                icon: mdi:party-popper
+
+              # ── Party OFF (manual) ──
+              - type: tile
+                entity: script.living_room_party_off
+                name: 🛑 Party OFF
+                color: grey
+                tap_action:
+                  action: call-service
+                  service: script.living_room_party_off
+                state_content:
+                  - state
+                  - last-triggered
+                icon: mdi:stop-circle-outline
+
+          - type: entities
+            title: 🤖 Auto-trigger Hooks (เปิด/ปิดได้)
+            show_header_toggle: false
+            entities:
+              - entity: automation.gas_alert_auto_vent_fan_on
+                name: 🚨 Gas Alert → Red Flash + Vent fan
+                secondary_info: last-triggered
+              - entity: automation.water_leak_line_alert
+                name: 💧 Water Leak → Blue Pulse + LINE
+                secondary_info: last-triggered
+              - entity: automation.garage_smoke_alert_line_alert
+                name: 🔥 Garage Smoke → Red Flash + LINE
+                secondary_info: last-triggered
+              - entity: automation.gps_klabbaan_home_mode
+                name: 🏠 GPS Home → Welcome scene
+                secondary_info: last-triggered
+              - entity: automation.daily_sunrise_wake_up_at_06_00
+                name: 🌅 Daily Sunrise (06:00)
+                secondary_info: last-triggered
+              - entity: automation.living_room_light_mode_scene
+                name: 🎨 Mood Scene (on mode change)
+                secondary_info: last-triggered
+
+          - type: entities
+            title: 🎨 Mode Selectors (เปลี่ยน mood)
+            entities:
+              - entity: input_select.house_mode
+                name: House Mode
+              - entity: input_select.comfort_mode
+                name: Comfort Mode
+
+          - type: entities
+            title: 📡 Zigbee Signal
+            entities:
+              - entity: sensor.livingroom_pir_battery
+                name: Motion Battery
+              - entity: binary_sensor.front_door
+                name: ประตูหน้าบ้าน Front Door
+
+  # ════════════════════════════════════════════════════════════
+  # 4. ประตูหน้า / Front Door
+  # ════════════════════════════════════════════════════════════
+  - title: ประตูหน้า
+    path: front-door
+    icon: mdi:door
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              ## 🚪 ประตูหน้า / Front Door
+              **SNZB-04** door contact sensor (Zigbee — pending pair)
+              **Servo SG90 180°** lock (planned — host on ESP32 #2)
+
+          - type: entities
+            title: 🚪 Status & Control
+            entities:
+              - entity: binary_sensor.front_door
+                name: ประตูเปิด/ปิด
+                secondary_info: last-changed
+              - entity: lock.front_door_lock
+                name: ล็อค/ปลดล็อค
+                secondary_info: last-changed
+
+          - type: history-graph
+            title: ประวัติ 24 ชม.
+            hours_to_show: 24
+            entities:
+              - entity: binary_sensor.front_door
+              - entity: lock.front_door_lock
+
+  # ════════════════════════════════════════════════════════════
+  # 5. ห้องครัว / Kitchen
+  # ════════════════════════════════════════════════════════════
+  - title: ห้องครัว
+    path: kitchen
+    icon: mdi:stove
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              ## 🍳 ห้องครัว / Kitchen
+              ESP32 #3 — DHT22 + MQ-2 (LPG/smoke) + LDR + LED + Relay×2 (Stove + Fan)
+
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.kitchen_temperature
+                name: อุณหภูมิ
+                unit: °C
+                min: 15
+                max: 50
+                severity:
+                  green: 22
+                  yellow: 30
+                  red: 40
+              - type: gauge
+                entity: sensor.kitchen_humidity
+                name: ความชื้น
+                unit: '%'
+
+          - type: entities
+            title: 🚨 Gas Detection
+            entities:
+              - entity: binary_sensor.kitchen_gas_alert
+                name: แจ้งแก๊สรั่ว
+                icon: mdi:gas-cylinder
+              - entity: sensor.kitchen_gas_lpg
+                name: เซ็นเซอร์ LPG (raw)
+              - entity: sensor.kitchen_ldr
+                name: ระดับแสง
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: 🍳 Actuators
+            show_header_toggle: false
+            entities:
+              - entity: switch.kitchen_light
+                name: ไฟครัว
+                icon: mdi:lightbulb
+              - entity: switch.kitchen_stove
+                name: เตาแก๊ส (จำลอง)
+                icon: mdi:stove
+              - entity: switch.kitchen_fan
+                name: พัดลมระบายอากาศ
+                icon: mdi:fan
+
+  # ════════════════════════════════════════════════════════════
+  # 6. ห้องน้ำ / Bathroom
+  # ════════════════════════════════════════════════════════════
+  - title: ห้องน้ำ
+    path: bathroom
+    icon: mdi:shower
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              ## 🛁 ห้องน้ำ / Bathroom
+              ESP32 #4 (shared with Garden) — DHT22 + LD2410C (fall) + LDR + LED
+              **Zigbee:** SONOFF SNZB-05P water leak
+
+          - type: entities
+            title: 👤 Presence & Safety
+            entities:
+              - entity: binary_sensor.bathroom_presence
+                name: คนอยู่ในห้องน้ำ
+              - entity: binary_sensor.bathroom_fall_alert
+                name: แจ้งคนล้ม (5 นาที stationary)
+                icon: mdi:alert
+              - entity: sensor.bathroom_ldr
+                name: ระดับแสง
+
+          - type: entities
+            title: 💧 Water Leak (Zigbee)
+            entities:
+              - entity: binary_sensor.bathroom_water_leak
+                name: ตรวจน้ำรั่ว
+                icon: mdi:water-alert
+              - entity: sensor.bathroom_water_leak_battery
+                name: Battery
+              - entity: sensor.bathroom_water_leak_battery
+                name: Link Quality
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: 💡 Actuators
+            entities:
+              - entity: switch.bathroom_light
+                name: ไฟห้องน้ำ
+                icon: mdi:lightbulb
+
+  # ════════════════════════════════════════════════════════════
+  # 7. สวน / Garden
+  # ════════════════════════════════════════════════════════════
+  - title: สวน
+    path: garden
+    icon: mdi:flower
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              ## 🌿 สวน / Garden
+              ESP32 #4 (shared with Bathroom) — Capacitive Soil Moisture + LDR (GPIO39) + Relay Pump + LED ×2
+
+          - type: gauge
+            entity: sensor.garden_soil_moisture
+            name: ความชื้นดิน
+            unit: '%'
+            min: 0
+            max: 100
+            severity:
+              red: 0
+              yellow: 30
+              green: 50
+
+          - type: entities
+            title: 🌱 Sensors
+            entities:
+              - entity: sensor.garden_soil_moisture
+                name: ความชื้นดิน / Soil Moisture
+              - entity: sensor.garden_soil_raw
+                name: Soil Raw ADC
+              - entity: sensor.garden_ldr
+                name: แสงสวน / Light Level
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: 💧 Watering
+            entities:
+              - entity: switch.garden_water_pump
+                name: ปั๊มรดน้ำ
+                icon: mdi:water-pump
+
+          - type: entities
+            title: 💡 ไฟสวน (Garden Lights)
+            show_header_toggle: false
+            entities:
+              # Master toggle — เปิด/ปิด ไฟสวน 1+2 พร้อมกัน
+              - entity: switch.garden_lights
+                name: 💡 ไฟสวนทั้งหมด (Master)
+                icon: mdi:lightbulb-group
+                secondary_info: last-changed
+              - type: divider
+              - entity: switch.garden_light_1
+                name: ไฟสวน 1
+                icon: mdi:outdoor-lamp
+              - entity: switch.garden_light_2
+                name: ไฟสวน 2
+                icon: mdi:outdoor-lamp
+
+  # ════════════════════════════════════════════════════════════
+  # 8. โรงรถ / Garage
+  # ════════════════════════════════════════════════════════════
+  - title: โรงรถ
+    path: garage
+    icon: mdi:garage
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              ## 🚗 โรงรถ / Garage
+              ESP32 #5 — PIR HC-SR501 + MQ-2 + LDR + Servo SG90 180° + LED ×2
+
+          - type: entities
+            title: 🚶 Motion & Smoke
+            entities:
+              - entity: binary_sensor.garage_motion
+                name: การเคลื่อนไหว (PIR)
+              - entity: binary_sensor.garage_smoke_alert
+                name: แจ้งควัน/แก๊ส (MQ-2)
+                icon: mdi:smoke
+              - entity: sensor.garage_smoke_lpg
+                name: LPG Level
+              - entity: sensor.garage_ldr
+                name: ระดับแสง
+
+      - type: vertical-stack
+        cards:
+          - type: tile
+            entity: cover.garage_door
+            name: ประตูโรงรถ
+            features:
+              - type: cover-open-close
+              - type: cover-position
+
+          - type: entities
+            title: 💡 Lights
+            show_header_toggle: true
+            entities:
+              - entity: switch.garage_light
+                name: ไฟโรงรถ
+                icon: mdi:lightbulb
+              - entity: switch.garage_pathway_light
+                name: ไฟทางเดิน
+                icon: mdi:outdoor-lamp
+
+  # ════════════════════════════════════════════════════════════
+  # 9. กราฟ / Charts
+  # ════════════════════════════════════════════════════════════
+  - title: กราฟ
+    path: charts
+    icon: mdi:chart-line
+    cards:
+      - type: history-graph
+        title: 🌡️ Temperature (24h)
+        hours_to_show: 24
+        entities:
+          - entity: sensor.bedroom_temperature
+            name: ห้องนอน
+          - entity: sensor.living_room_temperature
+            name: ห้องนั่งเล่น
+          - entity: sensor.kitchen_temperature
+            name: ครัว
+
+      - type: history-graph
+        title: 💧 Humidity (24h)
+        hours_to_show: 24
+        entities:
+          - entity: sensor.bedroom_humidity
+          - entity: sensor.living_room_humidity
+          - entity: sensor.kitchen_humidity
+
+      - type: history-graph
+        title: ⚡ Power Consumption — พัดลมห้องนั่งเล่น (24h)
+        hours_to_show: 24
+        entities:
+          - entity: sensor.living_room_fan_power
+            name: Watts
+          - entity: sensor.living_room_fan_energy
+            name: Energy (kWh)
+
+      - type: history-graph
+        title: 🌱 Soil Moisture (24h)
+        hours_to_show: 24
+        entities:
+          - entity: sensor.garden_soil_moisture
+
+      - type: history-graph
+        title: 💨 Air Quality + Gas (24h)
+        hours_to_show: 24
+        entities:
+          - entity: sensor.living_room_air_quality
+            name: Air Quality
+          - entity: sensor.kitchen_gas_lpg
+            name: Kitchen LPG
+          - entity: sensor.garage_smoke_lpg
+            name: Garage Smoke
+
+  # ════════════════════════════════════════════════════════════
+  # 10. โปรเจค / Project
+  # ════════════════════════════════════════════════════════════
+  - title: โปรเจค
+    path: project
+    icon: mdi:information-outline
+    cards:
+
+      # ── Hero: Project Identity ──────────────────────────
+      - type: markdown
+        content: |
+          # 🏠 Smart Home AIoT
+
+          ### ชาวี (Chawi) — ผู้ช่วยบ้านอัจฉริยะภาษาไทย
+
+          > *"ออกแบบเพื่อใช้งานจริง 24/7 บนระบบ Cloud-first — ปิดคอมไม่กระทบ"*
+
+          ---
+
+          | | |
+          |---|---|
+          | 👨‍🎓 **Project** | Senior Project — CE08 |
+          | 🗓️ **Defense** | 26 พฤษภาคม 2026 |
+          | 🌐 **Hosted** | AWS EC2 (us-east-1) + Railway + Pi 3B+ Edge |
+          | 🔌 **Status** | Production-ready · 24/7 cloud uptime |
+
+      # ── Abstract ────────────────────────────────────────
+      - type: markdown
+        content: |
+          ## 📋 Project Abstract
+
+          **Smart Home AIoT** คือระบบบ้านอัจฉริยะที่ผสาน **5 ESP32 zones**
+          (Wi-Fi-based sensors/actuators) เข้ากับ **Zigbee mesh** ผ่าน
+          Raspberry Pi 3B+ + Sonoff ZBDongle-E + Zigbee2MQTT — แล้วเปิดให้
+          ผู้ใช้งานสั่งงานผ่าน **LINE bot ภาษาไทย "ชาวี"** ที่ใช้ LLaMA 3.3 70B
+          วิเคราะห์ intent โดยอัตโนมัติ
+
+          ### 🎯 ปัญหาที่แก้ / Problem Statement
+
+          - บ้านส่วนใหญ่ใช้ smart device คนละแบรนด์ — ต้องเปิดหลาย app
+          - AI assistant สำเร็จรูปไม่เข้าใจภาษาไทยธรรมชาติ
+          - การ monitor บ้านระยะไกลต้องเปิดคอมตลอด
+          - ผู้สูงอายุล้มในห้องน้ำ/ห้องนอนแล้วไม่มีใครรู้ทันที
+
+          ### ✅ Solution Highlights
+
+          - **One bot, one conversation** — ชาวี เป็น face เดียวสำหรับ ESP32 + Zigbee + Alexa
+          - **Thai-first NLP** — Groq LLaMA 3.3 70B วิเคราะห์ intent ภาษาไทย
+          - **Cloud-first** — AWS EC2 + Railway → ปิด Mac ระบบทำงานต่อ
+          - **Multi-channel** — LINE + Alexa voice + HA mobile app + Web dashboard
+          - **Safety-first** — Fall detect, gas/water leak, smoke → auto-action + LINE alert
+
+      # ── Architecture ────────────────────────────────────
+      - type: markdown
+        content: |
+          ## 🏗️ System Architecture
+
+          ```
+          ┌──────────── PHYSICAL HOUSE (Model) ────────────┐
+          │                                                 │
+          │  ESP32 ×5 ──────┐      ┌──── Zigbee Devices    │
+          │  (Wi-Fi MQTT)   │      │      (Mesh, 2.4GHz)   │
+          │                 ▼      ▼                        │
+          │           Pi 3B+ + ZBDongle-E                   │
+          │           (Zigbee2MQTT Docker)                  │
+          │                  │                              │
+          └──────────────────┼──────────────────────────────┘
+                             │ MQTT (over Wi-Fi/Internet)
+                             ▼
+          ┌──────────────── CLOUD LAYER ────────────────────┐
+          │                                                  │
+          │   AWS EC2 t3.small (us-east-1) — 3.90.44.234    │
+          │   ├─ Home Assistant 2026.4.2                     │
+          │   ├─ Mosquitto MQTT broker (1883)                │
+          │   └─ 13 automation rules                         │
+          │              │                                   │
+          │              ├──► Railway n8n ──► Groq LLaMA    │
+          │              │    (3 workflows)    3.3 70B AI    │
+          │              │                                   │
+          │              ├──► LINE Messaging API → ชาวี Bot │
+          │              │                                   │
+          │              ├──► AWS Lambda → Alexa Custom Skill│
+          │              │                                   │
+          │              └──► Supabase PostgreSQL           │
+          │                   (chat logs, sensor history)    │
+          └──────────────────────────────────────────────────┘
+          ```
+
+      # ── Tech Stack ──────────────────────────────────────
+      - type: markdown
+        content: |
+          ## 🛠️ Tech Stack
+
+          ### Edge Layer
+          | Component | Tech | Version |
+          |---|---|---|
+          | Microcontroller | Espressif ESP32 DevKit V1 | Arduino 2.x |
+          | Local hub | Raspberry Pi 3 Model B+ | Debian 13 Trixie |
+          | Zigbee coordinator | Sonoff ZBDongle-E (EFR32MG21) | EmberZNet 7.4.4 |
+          | Zigbee stack | Zigbee2MQTT | 2.10.1 (Docker) |
+
+          ### Cloud Layer
+          | Component | Tech | Plan |
+          |---|---|---|
+          | Compute | AWS EC2 t3.small | Ubuntu 22.04 |
+          | Smart home OS | Home Assistant Core | 2026.4.2 |
+          | MQTT broker | Eclipse Mosquitto | 2.0.21 |
+          | Workflow engine | n8n on Railway | Pro |
+          | LLM | Groq LLaMA 3.3 70B | Free API |
+          | Database | Supabase PostgreSQL | Free tier |
+
+          ### Interaction Layer
+          | Channel | Tech |
+          |---|---|
+          | Chat | LINE Messaging API ("ชาวี" Bot) |
+          | Voice | Amazon Alexa Custom Skill (AWS Lambda Node.js 18) |
+          | Mobile | Home Assistant Companion App |
+          | Web | This dashboard (Lovelace YAML mode) |
+
+      # ── Hardware Zones ──────────────────────────────────
+      - type: markdown
+        content: |
+          ## 🏠 Hardware Zones (7 zones)
+
+          | Zone | Sensors | Actuators | Zigbee |
+          |---|---|---|---|
+          | 🛏️ **ห้องนอน** | DHT22 · LD2410C · LDR | Servo curtain · Fan · LED | — |
+          | 🛋️ **ห้องนั่งเล่น** | DHT22 · MQ-135 · LDR | (LED deprecated) | Bulb · Plug ×2 · Motion |
+          | 🚪 **ประตูหน้า** | (planned) | Servo SG90 (planned) | SNZB-04 (planned) |
+          | 🍳 **ห้องครัว** | DHT22 · MQ-2 · LDR | LED · Relay ×2 (stove + fan) | — |
+          | 🛁 **ห้องน้ำ** | DHT22 · LD2410C · LDR | LED | SNZB-05P (water leak) |
+          | 🌿 **สวน** | Soil moisture · LDR | Water pump · LED ×2 | — |
+          | 🚗 **โรงรถ** | PIR · MQ-2 · LDR | Servo door · LED ×2 | — |
+
+          ### 📊 รวมอุปกรณ์ทั้งระบบ
+
+          - **5 ESP32** boards + **1 Pi 3B+** = 6 microcontrollers/SBCs
+          - **20 sensors** (DHT22, MQ-2/135, LD2410C, PIR, LDR, Soil, etc.)
+          - **14 actuators** (LED ×8, Relay ×5, Servo ×3, Pump ×1)
+          - **6 Zigbee devices** (Tuya + Sonoff)
+          - = **40+ smart endpoints**
+
+      # ── Zigbee Network Details ──────────────────────────
+      - type: markdown
+        content: |
+          ## 📡 Zigbee Network
+
+          **Coordinator:** Sonoff ZBDongle-E (Silicon Labs EFR32MG21, EmberZNet 7.4.4)
+          on Raspberry Pi 3B+ at `172.20.10.4:8080` (Z2M frontend)
+
+          **MQTT Bridge:** Pi → EC2 Mosquitto at `3.90.44.234:1883` (topic prefix `zigbee2mqtt/`)
+
+          ### Paired Devices
+
+          | # | Friendly Name | Vendor / Model | Function | Status |
+          |---|---|---|---|---|
+          | 1 | `living_room_light` | Tuya TS0505B_1 | RGB+CCT bulb | ✅ Live |
+          | 2 | `living_room_fan` | Tuya TS011F_plug_1 | Smart plug + power monitor | ✅ Live |
+          | 3 | `living_room_air_purifier` | Tuya TS011F | Air purifier plug | ⏳ Pending |
+          | 4 | `living_room_motion` | SONOFF SNZB-03P | PIR motion + lux | ✅ Live |
+          | 5 | `bathroom_water_leak` | SONOFF SNZB-05P | Water leak sensor | ✅ Live |
+          | 6 | `front_door` | SONOFF SNZB-04 | Magnetic door contact | ⏳ Pending |
+
+          **Progress:** 4/6 paired (67%) — 2 pending physical install
+
+      # ── Features ────────────────────────────────────────
+      - type: markdown
+        content: |
+          ## ✨ Key Features
+
+          ### 🤖 AI Assistant — "ชาวี"
+          - เข้าใจภาษาไทยธรรมชาติ — *"เปิดไฟห้องนั่งเล่น"*, *"อากาศห้องเป็นไง?"*, *"สวนแห้งมั้ย"*
+          - 2-turn conversation memory (persistent ใน Supabase)
+          - 13 automation rules ทำงานอัตโนมัติ
+          - Quick Reply 6 ปุ่ม + Rich Menu 12 ปุ่ม บน LINE
+
+          ### 🛡️ Safety & Security
+          - 🔥 **Gas leak detection** — MQ-2 ครัว/โรงรถ → auto-open vent fan + LINE alert
+          - 💧 **Water leak detection** — Zigbee SNZB-05P ห้องน้ำ → LINE alert ทันที
+          - 🏃 **Fall detection** — LD2410C ห้องน้ำ/ห้องนอน (5 นาที stationary) → LINE alert + emergency
+          - 🚪 **Front door monitoring** — เปิดค้าง > 1 นาที → LINE alert
+          - 🌫️ **Air quality** — MQ-135 ห้องนั่งเล่น สูง → เปิดเครื่องฟอกอากาศอัตโนมัติ
+
+          ### 🌬️ Climate & Comfort
+          - Auto-fan based on อุณหภูมิ DHT22
+          - Auto-curtain ตามเวลา + LDR (เช้าเปิด เย็นปิด)
+          - Multi-color smart lighting — เปลี่ยนสี/ความสว่างผ่าน Zigbee Tuya bulb
+          - Comfort Mode presets: Normal / Sleep / Movie / Away
+
+          ### 🌱 Garden Automation
+          - Auto-water pump เมื่อ Capacitive Soil < 30%
+          - Garden lights ตาม LDR (sunset → on, sunrise → off)
+
+          ### 📊 Multi-Platform Control
+          1. **LINE bot "ชาวี"** (primary) — Thai NLP + memory
+          2. **Home Assistant mobile app** — full control + maps + notifications
+          3. **Amazon Alexa** — *"Alexa, open smart home"* → voice commands
+          4. **Web dashboard** (this UI) — Sections layout + per-room details
+          5. **Direct MQTT** — for developers/debug
+
+      # ── Achievements ────────────────────────────────────
+      - type: markdown
+        content: |
+          ## 🏆 Project Achievements
+
+          - ✅ **24/7 cloud uptime** — ระบบทำงาน ~30 วันโดยไม่ปิด
+          - ✅ **End-to-end Thai NLP** — ตอบสนองคำสั่งภาษาไทย 95%+ accuracy
+          - ✅ **Zigbee + ESP32 unified** — 2 protocols, 1 dashboard, 1 bot
+          - ✅ **Sub-second response** — Voice/LINE → device action < 1.5s
+          - ✅ **Bilingual UI** — ไทย-อังกฤษ ใช้งานได้ทั่วโลก
+          - ✅ **Production-grade architecture** — Docker, systemd, healthcheck, retry logic
+          - ✅ **Resilient design** — Pi AP fallback if Wi-Fi fails (planned)
+
+      # ── Open Source Acknowledgments ─────────────────────
+      - type: markdown
+        content: |
+          ## 🙏 Open Source Acknowledgments
+
+          โครงการนี้ยืนอยู่บนไหล่ของ OSS projects เหล่านี้:
+
+          ### Software
+          - [Home Assistant](https://www.home-assistant.io) — Smart home platform
+          - [Zigbee2MQTT](https://www.zigbee2mqtt.io) — Zigbee ↔ MQTT bridge
+          - [Eclipse Mosquitto](https://mosquitto.org) — MQTT broker
+          - [n8n](https://n8n.io) — Workflow automation
+          - [Arduino](https://www.arduino.cc) — ESP32 firmware framework
+          - [Groq](https://groq.com) — LLM inference (LLaMA 3.3 70B)
+          - [Material Design Icons](https://pictogrammers.com/library/mdi/) — Icons (`mdi:*`)
+          - [Docker](https://www.docker.com) — Container runtime on Pi
+
+          ### Hardware Suppliers
+          - Espressif (ESP32 chips)
+          - ITEAD / SONOFF (Zigbee devices, ZBDongle-E)
+          - Raspberry Pi Foundation (Pi 3B+)
+          - Tuya (smart bulb + plugs)
+          - Aosong (DHT22), Hi-Link (LD2410C mmWave)
+          - Hanwei (MQ-2, MQ-135 gas sensors)
+
+          ### 👨‍🏫 Special Thanks
+          - **อาจารย์ที่ปรึกษาโครงการ** — แนะนำตลอดเทอม
+          - **เพื่อน CE08** — ทดสอบใช้งานจริง
+          - **ครอบครัว** — สนับสนุนทั้งกาย-ใจ-เงิน
+          - **HA Thailand Community** — ไขปัญหา Home Assistant ภาษาไทย
+
+      # ── Contact / Repo ──────────────────────────────────
+      - type: markdown
+        content: |
+          ## 🔗 Links & Contact
+
+          | | |
+          |---|---|
+          | 🌐 **HA Web** | http://3.90.44.234:8123 |
+          | 📡 **Z2M Frontend** | http://172.20.10.4:8080 |
+          | 💬 **LINE Bot** | "ชาวี (Chawi)" |
+          | 🎙️ **Alexa Skill** | "Smart Home" custom skill |
+          | 📦 **Repo** | github.com/Maradosx/smart-home-aiot |
+
+          ---
+
+          *Last updated: 14 พฤษภาคม 2026 · Built with ❤️ + ☕ + 🦙 (Groq llama)*
