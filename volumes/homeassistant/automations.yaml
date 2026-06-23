@@ -534,11 +534,6 @@
       color_name: red
       brightness: 255
     action: light.turn_on
-  - data:
-      alert_type: gas_alert
-      value: '{{ states(''sensor.kitchen_gas_lpg'') }}'
-      room: kitchen
-    action: rest_command.send_alert
   mode: single
 - id: mobile_water_leak
   alias: "\U0001F4F1 [Mobile+LINE] Water Leak - ALL CHANNELS"
@@ -567,11 +562,6 @@
       color_name: red
       brightness: 255
     action: light.turn_on
-  - data:
-      alert_type: water_leak
-      value: detected
-      room: bathroom
-    action: rest_command.send_alert
   mode: single
 - id: mobile_bathroom_fall
   alias: "\U0001F4F1 [Mobile+LINE] Bathroom Fall - ALL CHANNELS"
@@ -593,11 +583,6 @@
       message: การล้มในห้องน้ำ!
       notification_id: bathroom_fall_critical
     action: persistent_notification.create
-  - data:
-      alert_type: fall_alert
-      value: detected
-      room: bathroom
-    action: rest_command.send_alert
   mode: single
 - id: mobile_door_intrusion
   alias: "\U0001F4F1 [Mobile+LINE] Door Intrusion (Away/Security)"
