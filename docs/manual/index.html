@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คู่มือบ้านอัจฉริยะ — Smart Home AIoT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b1a2b; --navy:#12314f; --steel:#33506e;
+  --teal:#0fb9b1; --teal2:#16d6cc; --amber:#f6a623; --rose:#ff5d73;
+  --bg:#eef2f7; --card:#ffffff; --line:#e2e8f1;
+  --muted:#647890; --soft:#f4f7fb;
+  --c-light:#f6a623; --c-climate:#0fb9b1; --c-garden:#3fb950; --c-mode:#6c8cff;
+  --c-gps:#9b7bff; --c-door:#ff8a4c; --c-safety:#ff5d73; --c-time:#ffb020; --c-scene:#d36bff; --c-ai:#12c2c2;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans Thai",sans-serif;line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.grp-row td{background:linear-gradient(90deg,var(--gc,#12314f),transparent 85%);color:#fff;font-family:"Kanit";font-weight:600;font-size:14px;border-bottom:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+h1,h2,h3,h4{font-family:"Kanit",sans-serif;font-weight:600;line-height:1.2;margin:0}
+.mono{font-family:"Space Grotesk",monospace}
+code{font-family:"Space Grotesk",monospace;background:#eaf6f5;color:#0a7d77;padding:1px 7px;border-radius:6px;font-size:.88em;font-weight:600}
+
+/* COVER */
+.cover{background:
+   radial-gradient(1200px 500px at 80% -10%, rgba(22,214,204,.35), transparent 60%),
+   linear-gradient(135deg,#0b1a2b 0%,#12314f 48%,#0a6b6a 100%);
+  color:#fff;padding:64px 0 54px;position:relative;overflow:hidden}
+.cover::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(700px 320px at 12% 110%, rgba(246,166,35,.18), transparent 60%);pointer-events:none}
+.cover .wrap{position:relative;z-index:1}
+.badge-top{display:inline-flex;gap:8px;align-items:center;background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.22);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.3px}
+.cover h1{font-size:54px;font-weight:700;margin:18px 0 6px;letter-spacing:-.5px}
+.cover .sub{font-size:18px;color:#bfe9e6;font-weight:500;max-width:680px}
+.cover .by{margin-top:14px;color:#9fb6c9;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:34px}
+.stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:16px 18px;backdrop-filter:blur(4px)}
+.stat .n{font-family:"Space Grotesk";font-size:32px;font-weight:700;color:var(--teal2);line-height:1}
+.stat .l{font-size:12.5px;color:#cfe0ee;margin-top:6px;font-weight:500}
+
+/* SECTION */
+section{padding:38px 0 8px}
+.kicker{font-family:"Kanit";font-weight:600;color:var(--teal);font-size:13px;letter-spacing:2px;text-transform:uppercase}
+.h-sec{font-size:30px;margin:6px 0 4px;color:var(--ink)}
+.lead{color:var(--muted);max-width:760px;margin-bottom:18px}
+
+/* category band */
+.cat{display:flex;align-items:center;gap:12px;margin:30px 0 14px;padding:12px 18px;border-radius:14px;
+  background:var(--card);border:1px solid var(--line);border-left:6px solid var(--cc,#0fb9b1);box-shadow:0 1px 0 rgba(16,30,50,.03)}
+.cat .ico{font-size:24px}
+.cat h3{font-size:20px}
+.cat .cnt{margin-left:auto;font-family:"Space Grotesk";font-weight:600;font-size:13px;color:#fff;background:var(--cc,#0fb9b1);padding:3px 11px;border-radius:999px}
+
+/* cards grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 17px;box-shadow:0 2px 10px rgba(16,30,50,.04)}
+.card h4{font-size:16px;margin-bottom:4px;display:flex;gap:8px;align-items:baseline}
+.card h4 .dot{width:8px;height:8px;border-radius:50%;background:var(--cc,#0fb9b1);flex:0 0 auto;transform:translateY(-1px)}
+.card .desc{color:var(--muted);font-size:13.5px;margin:4px 0 10px}
+.flow{font-size:13px;display:grid;gap:5px}
+.flow div{display:flex;gap:7px}
+.flow .k{flex:0 0 64px;font-weight:600;color:var(--steel);font-size:12px}
+.flow .v{color:#28435f}
+.tag{display:inline-block;background:#eef7f6;color:#0a7d77;border-radius:6px;padding:0 7px;font-size:12px;font-weight:600;font-family:"Space Grotesk"}
+
+/* tables */
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft);font-family:"Kanit";font-weight:600;color:var(--navy);font-size:13px}
+tr:last-child td{border-bottom:none}
+td .mono,td code{white-space:nowrap}
+
+/* command two-col */
+.cmd th:first-child{color:#0a7d77}
+.cmd th:last-child{color:#1f6feb}
+.say{font-weight:600}
+
+/* timeline */
+.tl{position:relative;margin:8px 0 8px 8px;padding-left:24px;border-left:2px dashed #c8d6e6}
+.tl .ev{position:relative;margin-bottom:14px}
+.tl .ev::before{content:"";position:absolute;left:-31px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--amber);border:3px solid #fff;box-shadow:0 0 0 2px var(--amber)}
+.tl .t{font-family:"Space Grotesk";font-weight:700;color:var(--navy);font-size:15px}
+.tl .d{color:var(--muted);font-size:13.5px}
+
+/* callout */
+.call{background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--line);border-left:5px solid var(--rose);
+  border-radius:12px;padding:16px 18px;margin:10px 0}
+.call.teal{border-left-color:var(--teal)} .call.amber{border-left-color:var(--amber)}
+.call h4{font-size:16px;margin-bottom:6px}
+
+/* checklist */
+.chk{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 4px}
+.chk .row{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;border-bottom:1px solid var(--line)}
+.chk .row:last-child{border-bottom:none}
+.chk .box{flex:0 0 20px;height:20px;border:2px solid var(--teal);border-radius:5px;margin-top:2px}
+.chk .num{flex:0 0 30px;font-family:"Space Grotesk";font-weight:700;color:var(--teal);font-size:15px}
+.chk .txt b{color:var(--ink)} .chk .txt span{color:var(--muted)}
+.grp{font-family:"Kanit";font-weight:600;color:var(--navy);margin:18px 0 6px;font-size:16px}
+
+.note{font-size:12.5px;color:var(--muted)}
+footer{margin-top:40px;background:var(--ink);color:#aebfd2;padding:26px 0;font-size:13px}
+footer b{color:#fff}
+.pill{display:inline-block;background:#eaf6f5;color:#0a7d77;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;margin:2px 3px}
+@media print{
+  body{background:#fff;font-size:11.5px}
+  .cover{padding:30px 0}
+  .card,.cat,table,.chk,.call{box-shadow:none;break-inside:avoid}
+  .grid{grid-template-columns:1fr 1fr}
+  section{padding:14px 0}
+  a[href]::after{content:""}
+}
+@media(max-width:680px){.stats{grid-template-columns:repeat(2,1fr)}.cover h1{font-size:38px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover"><div class="wrap">
+  <span class="badge-top">🏠 SMART HOME AIoT · คู่มือบ้านฉบับสมบูรณ์</span>
+  <h1>คู่มือบ้านอัจฉริยะ</h1>
+  <div class="sub">ระบบบ้านอัจฉริยะแบบ 3 ชั้น — ควบคุมด้วยเสียง (Alexa), แชต (ชาวี/LINE) และระบบอัตโนมัติที่ขับเคลื่อนด้วย AI</div>
+  <div class="by">โดย Athit "Mos" Boonpinit &amp; Titipan "Peach" Kilnmakphol · Bangkok University CE08 · อัปเดต 23 มิ.ย. 2569</div>
+  <div class="stats">
+    <div class="stat"><div class="n">244</div><div class="l">Entities ในระบบ</div></div>
+    <div class="stat"><div class="n">79</div><div class="l">Automations (ทำงาน 70)</div></div>
+    <div class="stat"><div class="n">10</div><div class="l">อุปกรณ์ควบคุมได้</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">ผู้ช่วย AI (เสียง+แชต)</div></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+<!-- OVERVIEW -->
+<section>
+  <div class="kicker">ภาพรวมระบบ</div>
+  <h2 class="h-sec">สถาปัตยกรรม 3 ชั้น</h2>
+  <p class="lead">สมองกลางคือ <b>Home Assistant</b> บน AWS EC2 เชื่อมทุกอุปกรณ์ผ่าน MQTT — มี <b>Claude Haiku 4.5</b> เป็นสมอง AI ที่ใช้ร่วมกันทั้ง LINE และ Alexa</p>
+  <div class="grid">
+    <div class="card"><h4><span class="dot"></span>🧠 ชั้นสมอง (Cloud)</h4><div class="desc">Home Assistant + Mosquitto MQTT + n8n บน AWS EC2 (Docker) · Claude Haiku 4.5 (AI) · Supabase (เก็บประวัติแชต) · Met.no (อากาศจริง)</div></div>
+    <div class="card"><h4><span class="dot"></span>📡 ชั้นเชื่อมต่อ</h4><div class="desc">ngrok tunnel ถาวร → LINE webhook · AWS Lambda → Alexa Skill "home control" · MQTT over WiFi</div></div>
+    <div class="card"><h4><span class="dot"></span>🔌 ชั้นอุปกรณ์ (Edge)</h4><div class="desc">ESP32 ×5 โซน (MQTT) · Raspberry Pi + Zigbee2MQTT (6 อุปกรณ์ Zigbee) · เซนเซอร์ mmWave / แก๊ส / น้ำรั่ว / ดิน / LDR</div></div>
+  </div>
+
+  <h3 style="margin:26px 0 10px;font-size:19px">🔧 อุปกรณ์ที่ควบคุมได้ (Entities หลัก)</h3>
+  <table>
+    <tr><th>ประเภท</th><th>อุปกรณ์</th><th>ชนิด/หมายเหตุ</th></tr>
+    <tr><td>💡 ไฟ</td><td><code>light.living_room_light</code></td><td>หลอด Tuya RGB+CCT 16 ล้านสี (เปลี่ยนสี/อุณหภูมิแสงได้)</td></tr>
+    <tr><td>💡 ไฟ</td><td><code>switch.bedroom/kitchen/bathroom_light</code></td><td>ไฟห้องนอน/ครัว/น้ำ (สวิตช์)</td></tr>
+    <tr><td>💨 พัดลม</td><td><code>switch.living_room/bedroom/kitchen_fan</code></td><td>พัดลม 3 ห้อง</td></tr>
+    <tr><td>🌫️ ฟอกอากาศ</td><td><code>switch.living_room_air_purifier</code></td><td>เครื่องฟอกอากาศ</td></tr>
+    <tr><td>🌱 สวน</td><td><code>switch.garden_water_pump</code>, <code>garden_lights</code></td><td>ปั๊มรดน้ำ + ไฟสวน</td></tr>
+    <tr><td>🚗 โรงรถ</td><td><code>cover.garage_door</code>, <code>switch.garage_light/pathway</code></td><td>ประตูโรงรถ + ไฟ</td></tr>
+    <tr><td>🪟 ม่าน/ล็อก</td><td><code>cover.bedroom_curtain</code>, <code>lock.front_door_lock</code></td><td>ม่านห้องนอน + ล็อกประตูหน้า</td></tr>
+    <tr><td>🎚️ โหมด</td><td><code>house_mode</code> (Home/Away/Security) · <code>comfort_mode</code> (Normal/Relax/Warm/Sleep)</td><td>โหมดบ้าน + โหมดความสบาย</td></tr>
+  </table>
+</section>
+
+<!-- AUTOMATIONS -->
+<section>
+  <div class="kicker">ระบบอัตโนมัติ</div>
+  <h2 class="h-sec">Automation ทั้งหมด แยกตามหมวด</h2>
+  <p class="lead">ทุกตัวระบุ <b>เงื่อนไขจริง + ตัวเลขจริง</b> ที่ใช้ในระบบ</p>
+
+  <!-- 1 LIGHTING -->
+  <div class="cat" style="--cc:var(--c-light)"><span class="ico">💡</span><h3>ไฟอัจฉริยะ (Smart Lighting)</h3><span class="cnt">4 ห้อง × 3</span></div>
+  <div class="grid">
+    <div class="card" style="--cc:var(--c-light)"><h4><span class="dot"></span>เปิดไฟอัตโนมัติ</h4>
+      <div class="desc">มีคน + ห้องมืดพอ → เปิดไฟให้เอง (ห้องนอน/นั่งเล่น/น้ำ/โรงรถ)</div>
+      <div class="flow">
+        <div><span class="k">เงื่อนไข</span><span class="v">มีคน (PIR/mmWave) <b>และ</b> ค่าแสง LDR เกินเกณฑ์มืด</span></div>
+        <div><span class="k">เกณฑ์มืด</span><span class="v">นอน/นั่งเล่น/โรงรถ <span class="tag">LDR &gt; 2800</span> · ห้องน้ำ <span class="tag">&gt; 2200</span></span></div>
+        <div><span class="k">กันไว้</span><span class="v">ไม่เปิดถ้า: กดสวิตช์เอง / โหมด Away·Security·Sleep / มีสัญญาณเตือน</span></div>
+      </div></div>
+    <div class="card" style="--cc:var(--c-light)"><h4><span class="dot"></span>ปิดไฟอัตโนมัติ</h4>
+      <div class="desc">ไม่มีคนในห้อง → ดับไฟเอง</div>
+      <div class="flow"><div><span class="k">เงื่อนไข</span><span class="v">ไม่มีคน <span class="tag">5 นาที</span> → ปิด</span></div></div></div>
+    <div class="card" style="--cc:var(--c-light)"><h4><span class="dot"></span>กดสวิตช์เอง (Manual Override)</h4>
+      <div class="desc">กดปิด/เปิดไฟเอง → ระบบจะไม่แทรกแซง</div>
+      <div class="flow">
+        <div><span class="k">ทำงาน</span><span class="v">กดสวิตช์เอง → ล็อกไม่ให้ auto <span class="tag">30 นาที</span></span></div>
+        <div><span class="k">คืนค่า</span><span class="v">ครบ 30 นาที → กลับเป็นอัตโนมัติเอง</span></div>
+      </div></div>
+    <div class="card" style="--cc:#9aa7b6"><h4><span class="dot" style="background:#9aa7b6"></span>ห้องครัว</h4>
+      <div class="desc">ใช้สวิตช์มือ/สั่งด้วยเสียง·แชต — ไม่มี auto-on (ตามดีไซน์)</div></div>
+  </div>
+
+  <!-- 2 CLIMATE -->
+  <div class="cat" style="--cc:var(--c-climate)"><span class="ico">🌡️</span><h3>อุณหภูมิ & พัดลม (Climate)</h3><span class="cnt">4</span></div>
+  <table>
+    <tr><th>Automation</th><th>เปิดเมื่อ</th><th>ปิดเมื่อ</th></tr>
+    <tr><td>พัดลมตามอุณหภูมิ (ทั่วไป)</td><td>นั่งเล่น <span class="tag">&gt; 30°C</span> + อยู่บ้าน</td><td>นั่งเล่น <span class="tag">&lt; 28°C</span> (กันกระพริบ)</td></tr>
+    <tr><td>โหมด Relax</td><td>Relax + นั่งเล่น <span class="tag">&gt; 28°C</span></td><td>—</td></tr>
+    <tr><td>โหมด Sleep — พัดลมห้องนอน</td><td>Sleep + ห้องนอน <span class="tag">&gt; 27°C</span></td><td>ห้องนอน <span class="tag">&lt; 25°C</span></td></tr>
+    <tr><td>เครื่องฟอกอากาศ</td><td>เซนเซอร์อากาศแจ้งเตือน (AQI แย่)</td><td>อากาศกลับดี (เฉพาะอยู่บ้าน)</td></tr>
+  </table>
+  <p class="note">💡 ไม่มีแอร์ในบ้าน — ระบบจึงใช้พัดลม + ฟอกอากาศจัดการความสบาย · พัดลมใช้ <b>hysteresis</b> (เปิด/ปิดคนละเกณฑ์) กันการกระพริบ</p>
+
+  <!-- 3 GARDEN -->
+  <div class="cat" style="--cc:var(--c-garden)"><span class="ico">🌱</span><h3>สวน & ปั๊มรดน้ำ (Garden)</h3><span class="cnt">4</span></div>
+  <div class="grid">
+    <div class="card" style="--cc:var(--c-garden)"><h4><span class="dot"></span>ปั๊มอัจฉริยะ (ตามดิน)</h4>
+      <div class="flow">
+        <div><span class="k">เปิด</span><span class="v">ดินแห้ง <span class="tag">&lt; 45%</span> + กลางวัน + ไม่ฝน (เช็คอากาศจริง)</span></div>
+        <div><span class="k">ปิด</span><span class="v">ดินชุ่ม <span class="tag">&gt; 60%</span></span></div>
+        <div><span class="k">นิรภัย</span><span class="v">ปั๊มทำงานเกิน <span class="tag">10 นาที</span> → ตัดอัตโนมัติ + แจ้งเตือน</span></div>
+      </div></div>
+    <div class="card" style="--cc:var(--c-garden)"><h4><span class="dot"></span>รดน้ำเช้า 07:00</h4>
+      <div class="desc">รดน้ำตอนเช้า — แต่เฉพาะถ้าจำเป็น</div>
+      <div class="flow">
+        <div><span class="k">เงื่อนไข</span><span class="v">07:00 + ดิน <span class="tag">&lt; 50%</span> + ไม่ฝน → ปั๊ม 10 วินาที</span></div>
+        <div><span class="k">ข้าม</span><span class="v">ถ้าดินเปียก/ฝนตก = ไม่รด (กันสิ้นเปลือง)</span></div>
+      </div></div>
+  </div>
+
+  <!-- 4 MODE -->
+  <div class="cat" style="--cc:var(--c-mode)"><span class="ico">🏠</span><h3>โหมดบ้าน (House Modes)</h3><span class="cnt">3</span></div>
+  <table>
+    <tr><th>โหมด</th><th>ทำอะไร</th></tr>
+    <tr><td><b>🏠 Home</b></td><td>ใช้งานปกติ — ไฟอัตโนมัติทำงานเต็มที่</td></tr>
+    <tr><td><b>🚪 Away</b></td><td>ปิดไฟ/พัดลม/ปลั๊กทุกตัว + <b>ล็อกประตูหน้า</b> + <b>ปิดประตูโรงรถ</b> + ปิดไฟสวน</td></tr>
+    <tr><td><b>🛡️ Security</b></td><td>เหมือน Away + ปิดโรงรถ + ล็อกประตู (โหมดเฝ้าระวัง)</td></tr>
+    <tr><td><b>😴 Sleep</b> <span class="note">(comfort)</span></td><td>ปิดไฟทุกดวง + ปิดม่านห้องนอน + คุมพัดลมห้องนอนตามอุณหภูมิ</td></tr>
+  </table>
+
+  <!-- 5 GPS -->
+  <div class="cat" style="--cc:var(--c-gps)"><span class="ico">📍</span><h3>GPS อัตโนมัติ (Presence)</h3><span class="cnt">2</span></div>
+  <div class="grid">
+    <div class="card" style="--cc:var(--c-gps)"><h4><span class="dot"></span>กลับถึงบ้าน</h4>
+      <div class="flow"><div><span class="k">เงื่อนไข</span><span class="v">GPS เข้าเขตบ้าน (ต้องเคย Away) + หน่วง <span class="tag">30 วินาที</span> กันสัญญาณเด้ง</span></div>
+      <div><span class="k">ทำ</span><span class="v">เปิดโรงรถ + เปิดไฟภายนอก (ถ้ามืด) + ตั้งโหมด Home</span></div></div></div>
+    <div class="card" style="--cc:var(--c-gps)"><h4><span class="dot"></span>ออกจากบ้าน</h4>
+      <div class="flow"><div><span class="k">เงื่อนไข</span><span class="v">ออกนอกเขตบ้านเกิน <span class="tag">2 นาที</span></span></div>
+      <div><span class="k">ทำ</span><span class="v">ตั้งโหมด Away อัตโนมัติ (→ ปิดทุกอย่าง+ล็อก)</span></div></div></div>
+  </div>
+
+  <!-- 6 DOOR -->
+  <div class="cat" style="--cc:var(--c-door)"><span class="ico">🚪</span><h3>ประตู โรงรถ ล็อก</h3><span class="cnt">3</span></div>
+  <table>
+    <tr><th>Automation</th><th>เงื่อนไข → การทำงาน</th></tr>
+    <tr><td>ประตูหน้าไม่ล็อกนาน</td><td>ไม่ล็อก <span class="tag">10 นาที</span> (อยู่บ้าน) → เตือน LINE</td></tr>
+    <tr><td>โรงรถปิดอัตโนมัติ</td><td>เปิดค้าง <span class="tag">5 นาที</span> (อยู่บ้าน) → ปิดเอง</td></tr>
+    <tr><td>ตรวจจับบุกรุก</td><td>ประตูเปิดตอนโหมด Away/Security → เตือน LINE + มือถือ</td></tr>
+  </table>
+
+  <!-- 7 SAFETY -->
+  <div class="cat" style="--cc:var(--c-safety)"><span class="ico">🚨</span><h3>ความปลอดภัย (Safety)</h3><span class="cnt">6+</span></div>
+  <table>
+    <tr><th>เหตุการณ์</th><th>การตอบสนอง</th></tr>
+    <tr><td>🔥 แก๊สรั่ว (ครัว)</td><td>เปิดพัดลมระบาย + ไฟแดงกระพริบ + แจ้ง LINE + มือถือ</td></tr>
+    <tr><td>💧 น้ำรั่ว (ห้องน้ำ)</td><td>แจ้ง LINE + มือถือ + ไฟแดง</td></tr>
+    <tr><td>🤕 คนล้ม (ห้องน้ำ/ห้องนอน)</td><td>เรดาร์จับนิ่งเกิน <span class="tag">5 นาที</span> → แจ้ง LINE + มือถือ <span class="note">(ดูวิธีจับด้านล่าง)</span></td></tr>
+    <tr><td>💨 ควัน (โรงรถ)</td><td>แจ้ง LINE</td></tr>
+    <tr><td>🍳 เตาทิ้งไว้</td><td>เปิดค้าง <span class="tag">10 นาที</span> (มีคนในบ้าน) → เตือน · <span class="tag">15 นาที</span> (Away) → ตัดอุปกรณ์ + แจ้ง</td></tr>
+  </table>
+
+  <!-- 8 TIME -->
+  <div class="cat" style="--cc:var(--c-time)"><span class="ico">🌅</span><h3>ตามเวลา & ม่าน (Schedule)</h3><span class="cnt">5</span></div>
+  <div class="tl">
+    <div class="ev"><div class="t">06:00</div><div class="d">Sunrise Wake-up — ไฟค่อยๆ สว่าง 15 นาที (เฉพาะอยู่บ้าน)</div></div>
+    <div class="ev"><div class="t">07:00</div><div class="d">Daily Report → สรุปอากาศ/ในบ้านส่ง LINE · + รดน้ำเช้า (ถ้าดินแห้ง)</div></div>
+    <div class="ev"><div class="t">เช้า (หลัง sunrise +30 นาที)</div><div class="d">เปิดม่านห้องนอนอัตโนมัติ</div></div>
+    <div class="ev"><div class="t">18:00</div><div class="d">เปิดไฟสวน</div></div>
+    <div class="ev"><div class="t">พระอาทิตย์ตก</div><div class="d">ปิดม่านห้องนอน</div></div>
+    <div class="ev"><div class="t">23:00</div><div class="d">ปิดไฟทุกห้อง + ไฟสวน + แจ้ง LINE</div></div>
+  </div>
+
+  <!-- 9 SCENE -->
+  <div class="cat" style="--cc:var(--c-scene)"><span class="ico">🎬</span><h3>ซีนไฟ & เอฟเฟกต์ (Scenes)</h3><span class="cnt">8</span></div>
+  <table>
+    <tr><th>ซีน</th><th>ผล</th></tr>
+    <tr><td>🎉 ปาร์ตี้</td><td>วนสีไม่หยุด (มีนิรภัยตัดที่ <span class="tag">30 นาที</span>)</td></tr>
+    <tr><td>🚨 สัญญาณแดง</td><td>กระพริบแดง 6 ครั้ง (เหตุฉุกเฉิน) · มีนิรภัยเคลียร์ที่ <span class="tag">10 นาที</span></td></tr>
+    <tr><td>💧 ฟ้าสงบ / 🌅 แสงเช้า / 🏠 ต้อนรับ</td><td>ซีนบรรยากาศ (สั่งจากปุ่ม/เสียง/แชต)</td></tr>
+    <tr><td>🎨 สีตาม comfort mode</td><td>Normal 4000K · Relax ส้มอุ่น · Warm 2700K · Sleep แดงสลัว 15%</td></tr>
+    <tr><td>🔄 reset_normal (กลับปกติ)</td><td><b>ปุ่มหยุดทุกอย่าง</b> — หยุดทุกซีน/สัญญาณ + ไฟกลับ warm</td></tr>
+  </table>
+
+  <!-- 10 AI -->
+  <div class="cat" style="--cc:var(--c-ai)"><span class="ico">🤖</span><h3>ผู้ช่วย AI & แจ้งเตือน</h3><span class="cnt">2 ช่อง</span></div>
+  <div class="grid">
+    <div class="card" style="--cc:var(--c-ai)"><h4><span class="dot"></span>ชาวี (LINE · ไทย)</h4>
+      <div class="desc">LINE → ดึงประวัติแชต 6 ข้อความ → Claude Haiku 4.5 → <b>สั่งได้หลายอย่างพร้อมกัน</b> + จำบทสนทนาได้ + ตอบ + บันทึก</div></div>
+    <div class="card" style="--cc:var(--c-ai)"><h4><span class="dot"></span>Alexa (เสียง · อังกฤษ)</h4>
+      <div class="desc">Echo Dot → AWS Lambda → 18 คำสั่งเร็ว + สมอง Claude ตัวเดียวกัน (ถามอะไรก็ได้)</div></div>
+    <div class="card" style="--cc:var(--c-ai)"><h4><span class="dot"></span>แจ้งเตือน 2 ช่องทาง</h4>
+      <div class="desc">เปลี่ยนโหมด · แก๊ส · น้ำรั่ว · ล้ม · บุกรุก · ปั๊ม · โรงรถ → ส่ง <b>LINE + มือถือ</b> (อย่างละ 1 ไม่ซ้ำ)</div></div>
+  </div>
+</section>
+
+<!-- COMMANDS -->
+<section>
+  <div class="kicker">วิธีสั่งงาน</div>
+  <h2 class="h-sec">คำสั่ง ชาวี (LINE) & Alexa (เสียง)</h2>
+  <p class="lead">Alexa เรียกด้วย <code>"Alexa, ask home control to ..."</code> · ชาวีพิมพ์ภาษาไทยใน LINE ได้เลย</p>
+  <table class="cmd">
+    <tr><th>อยากให้ทำ</th><th>🤖 ชาวี (พิมพ์ใน LINE · ไทย)</th><th>🔊 Alexa (พูด · "Alexa, ask home control to…")</th></tr>
+
+    <tr class="grp-row" style="--gc:#f6a623"><td colspan="3">💡 ไฟ (Lights)</td></tr>
+    <tr><td>เปิด/ปิดไฟแต่ละห้อง</td><td class="say">"เปิดไฟห้องนั่งเล่น" · "ปิดไฟห้องนอน"</td><td class="say">"…turn on/off the living room light"</td></tr>
+    <tr><td>ไฟทุกดวง</td><td class="say">"เปิดไฟทั้งบ้าน" · "ปิดไฟทั้งบ้าน"</td><td class="say">"…turn on/off all the lights"</td></tr>
+    <tr><td>เปลี่ยนสีไฟ</td><td class="say">"ไฟสีฟ้า" · "สีแดง" · "สีเขียว" · "สีม่วง"</td><td class="say">"…set the light to blue / red / green"</td></tr>
+    <tr><td>หรี่ / ความสว่าง</td><td class="say">"หรี่ไฟเหลือ 30%"</td><td class="say">"…dim the light to 30 percent"</td></tr>
+    <tr><td>แสงอุ่น / ขาว</td><td class="say">"ไฟ warm" · "ไฟขาว"</td><td class="say">"…warm white / cool white"</td></tr>
+
+    <tr class="grp-row" style="--gc:#0fb9b1"><td colspan="3">💨 พัดลม & อากาศ (Climate)</td></tr>
+    <tr><td>พัดลม (3 ห้อง)</td><td class="say">"เปิดพัดลมห้องนอน" · "ปิดพัดลมห้องนั่งเล่น"</td><td class="say">"…turn on the bedroom fan"</td></tr>
+    <tr><td>เครื่องฟอกอากาศ</td><td class="say">"เปิดเครื่องฟอกอากาศ"</td><td class="say">"…turn on the air purifier"</td></tr>
+
+    <tr class="grp-row" style="--gc:#3fb950"><td colspan="3">🌱 สวน (Garden)</td></tr>
+    <tr><td>ปั๊มรดน้ำ</td><td class="say">"รดน้ำต้นไม้" · "เปิดปั๊มน้ำ"</td><td class="say">"…turn on the water pump"</td></tr>
+    <tr><td>ไฟสวน</td><td class="say">"เปิดไฟสวน" · "ปิดไฟสวน"</td><td class="say">"…turn on the garden lights"</td></tr>
+
+    <tr class="grp-row" style="--gc:#ff8a4c"><td colspan="3">🚪 ประตู · โรงรถ · ม่าน · ล็อก</td></tr>
+    <tr><td>ประตูโรงรถ</td><td class="say">"เปิดประตูโรงรถ" · "ปิดประตูโรงรถ"</td><td class="say">"…open/close the garage door"</td></tr>
+    <tr><td>ม่านห้องนอน</td><td class="say">"เปิดม่าน" · "ปิดม่าน"</td><td class="say">"…open/close the curtain"</td></tr>
+    <tr><td>ล็อก / ปลดล็อกประตูหน้า</td><td class="say">"ล็อคประตู" · "ปลดล็อคประตู"</td><td class="say">"…lock / unlock the front door"</td></tr>
+
+    <tr class="grp-row" style="--gc:#6c8cff"><td colspan="3">🏠 โหมดบ้าน (Modes)</td></tr>
+    <tr><td>โหมดบ้าน</td><td class="say">"โหมด home" · "away" · "security"</td><td class="say">"…set mode to home / away / security"</td></tr>
+    <tr><td>โหมดความสบาย</td><td class="say">"โหมดพักผ่อน" · "อุ่น" · "นอน" · "ปกติ"</td><td class="say">"…set comfort to relax / warm / sleep / normal"</td></tr>
+
+    <tr class="grp-row" style="--gc:#d36bff"><td colspan="3">🎬 ซีนไฟ (Scenes)</td></tr>
+    <tr><td>ปาร์ตี้</td><td class="say">"เปิดโหมดปาร์ตี้"</td><td class="say">"…start party mode"</td></tr>
+    <tr><td>แสงเช้า / ฟ้าสงบ / ต้อนรับ</td><td class="say">"ซีนแสงเช้า" · "ไฟฟ้าสงบ" · "ซีนต้อนรับ"</td><td class="say">"…sunrise / calm / welcome scene"</td></tr>
+    <tr><td>🔄 หยุดทุกอย่าง / กลับปกติ</td><td class="say">"กลับปกติ"</td><td class="say">"…reset everything"</td></tr>
+
+    <tr class="grp-row" style="--gc:#12314f"><td colspan="3">📊 สอบถามสถานะ (Status)</td></tr>
+    <tr><td>อุณหภูมิ</td><td class="say">"อุณหภูมิห้องนอนเท่าไหร่"</td><td class="say">"…what's the temperature in the bedroom"</td></tr>
+    <tr><td>ความชื้น</td><td class="say">"ความชื้นเท่าไหร่"</td><td class="say">"…what's the humidity"</td></tr>
+    <tr><td>แก๊ส / ความปลอดภัย</td><td class="say">"แก๊สรั่วไหม" · "ปลอดภัยไหม"</td><td class="say">"…is the gas safe"</td></tr>
+    <tr><td>คุณภาพอากาศ</td><td class="say">"อากาศเป็นไง"</td><td class="say">"…what's the air quality"</td></tr>
+    <tr><td>ดินสวน</td><td class="say">"ดินแห้งไหม"</td><td class="say">"…what's the soil moisture"</td></tr>
+    <tr><td>ประตู / ล็อก</td><td class="say">"ประตูล็อกไหม"</td><td class="say">"…is the front door locked"</td></tr>
+    <tr><td>อะไรเปิดอยู่บ้าง</td><td class="say">"มีอะไรเปิดอยู่บ้าง"</td><td class="say">"…what's on"</td></tr>
+
+    <tr class="grp-row" style="--gc:#12c2c2"><td colspan="3">🤖 ขั้นสูง (AI · Multi-action · Memory)</td></tr>
+    <tr><td>สั่งหลายอย่างพร้อมกัน</td><td class="say">"เปิดไฟห้องนอนกับพัดลม"</td><td class="say">"…turn on the bedroom light and fan"</td></tr>
+    <tr><td>พูดต่อเนื่อง (จำได้)</td><td class="say">"เปิดไฟครัว" → "ปิดมัน"</td><td class="say">"…turn on the kitchen light" → "…turn it off"</td></tr>
+    <tr><td>คุยเล่น / ถามอะไรก็ได้</td><td class="say">"วันนี้อากาศเป็นไง"</td><td class="say">"…how's everything at home"</td></tr>
+  </table>
+  <p class="note">💬 ชาวีตอบไทย · Alexa ตอบอังกฤษ (สมอง Claude ตัวเดียวกัน) · สั่งงานครั้งเดียวได้หลายอย่าง และจำสิ่งที่คุยก่อนหน้าได้ (เช่น "ปิดมัน" จะเข้าใจว่าหมายถึงอะไร)</p>
+</section>
+
+<!-- FALL DETECTION explainer -->
+<section>
+  <div class="kicker">เจาะลึก</div>
+  <h2 class="h-sec">วิธีจับ "คนล้ม" และ "คนอยู่ในห้อง"</h2>
+  <div class="call teal">
+    <h4>📡 เซนเซอร์: LD2410C mmWave Radar</h4>
+    ห้องน้ำและห้องนอนใช้ <b>เรดาร์คลื่นความถี่ mmWave</b> (ต่อ ESP32 ผ่าน UART) — ต่างจาก PIR ตรงที่ <b>จับคนที่อยู่นิ่งได้</b> (ไม่ต้องขยับ) เรดาร์รายงานสถานะ 4 แบบ: <code>0</code>=ไม่มีคน · <code>1</code>=มีคนขยับ · <code>2</code>=มีคนอยู่นิ่ง · <code>3</code>=ทั้งขยับ+นิ่ง · อ่านค่าทุก <b>500 มิลลิวินาที</b>
+  </div>
+  <div class="grid">
+    <div class="card" style="--cc:var(--teal)"><h4><span class="dot"></span>👤 คนอยู่ในห้อง (Presence)</h4>
+      <div class="desc">เงื่อนไข: <code>state ≠ 0</code> = มีคน (ขยับหรือนิ่งก็นับ)</div>
+      <div class="note">เพราะ mmWave จับคนนิ่งได้ → รู้ว่ามีคนนอนอยู่บนเตียงแม้ไม่ขยับ (PIR ทำไม่ได้)</div></div>
+    <div class="card" style="--cc:var(--rose)"><h4><span class="dot" style="background:var(--rose)"></span>🤕 คนล้ม (Fall)</h4>
+      <div class="flow">
+        <div><span class="k">ตรรกะ</span><span class="v">เจอคน "อยู่นิ่งสนิท" (state 2 เท่านั้น) ต่อเนื่อง</span></div>
+        <div><span class="k">เกณฑ์</span><span class="v">นิ่งเกิน <span class="tag">5 นาที</span> → แจ้งเตือน "ล้ม"</span></div>
+        <div><span class="k">รีเซ็ต</span><span class="v">ถ้าขยับ (1/3) หรือออกจากห้อง (0) → ล้างตัวจับเวลา</span></div>
+      </div></div>
+  </div>
+  <p class="note" style="margin-top:8px">🧠 <b>หลักการ:</b> คนปกติจะขยับตัวเล็กน้อยทุกไม่กี่นาที — ถ้าเรดาร์เห็นคน "นิ่งสนิทไม่ขยับเลย" นานเกิน 5 นาที สันนิษฐานว่าอาจล้ม/หมดสติ จึงแจ้งเตือน · ใช้หลักการเดียวกันทั้งห้องน้ำและห้องนอน</p>
+</section>
+
+<!-- TEST CHECKLIST -->
+<section>
+  <div class="kicker">ตรวจรับ</div>
+  <h2 class="h-sec">เช็คลิสต์ทดสอบ — ให้บ้านทำงาน 100%</h2>
+  <p class="lead">ไล่ติ๊กทีละข้อ ก่อนใช้งานจริง/พรีเซนต์</p>
+
+  <div class="grp">A · 🤖 ชาวี (LINE)</div>
+  <div class="chk">
+    <div class="row"><div class="num">1</div><div class="box"></div><div class="txt"><b>"เปิดไฟห้องนั่งเล่น"</b> <span>→ ไฟติด + ตอบกลับ</span></div></div>
+    <div class="row"><div class="num">2</div><div class="box"></div><div class="txt"><b>"ไฟสีฟ้า"</b> <span>→ หลอดเปลี่ยนเป็นฟ้า</span></div></div>
+    <div class="row"><div class="num">3</div><div class="box"></div><div class="txt"><b>"เปิดไฟห้องนอนกับพัดลม"</b> <span>→ ติดทั้งคู่ (สั่งหลายอย่าง)</span></div></div>
+    <div class="row"><div class="num">4</div><div class="box"></div><div class="txt"><b>"เปิดไฟครัว" แล้วต่อด้วย "ปิดมัน"</b> <span>→ ปิดไฟครัวถูก (จำบทสนทนา)</span></div></div>
+    <div class="row"><div class="num">5</div><div class="box"></div><div class="txt"><b>"กลับปกติ"</b> <span>→ หยุดทุกซีน + ไฟกลับ warm</span></div></div>
+    <div class="row"><div class="num">6</div><div class="box"></div><div class="txt"><b>"อุณหภูมิห้องนอนเท่าไหร่"</b> <span>→ ตอบค่าจริง</span></div></div>
+    <div class="row"><div class="num">7</div><div class="box"></div><div class="txt"><b>"เปิดแอร์"</b> <span>→ ตอบว่า "บ้านไม่มีแอร์" (ไม่มั่ว)</span></div></div>
+  </div>
+
+  <div class="grp">B · 🔊 Alexa (เสียง)</div>
+  <div class="chk">
+    <div class="row"><div class="num">8</div><div class="box"></div><div class="txt"><b>"Alexa, ask home control to turn on the living room light"</b> <span>→ ไฟติด</span></div></div>
+    <div class="row"><div class="num">9</div><div class="box"></div><div class="txt"><b>"...what's the temperature in the bedroom"</b> <span>→ ตอบเป็นอังกฤษ</span></div></div>
+    <div class="row"><div class="num">10</div><div class="box"></div><div class="txt"><b>"...set mode to away"</b> <span>→ ทุกอย่างดับ + ล็อก</span></div></div>
+    <div class="row"><div class="num">11</div><div class="box"></div><div class="txt"><b>ถาม free-form เช่น "...is it safe at home"</b> <span>→ ตอบฉลาด (สมอง Claude)</span></div></div>
+  </div>
+
+  <div class="grp">C · 🖥️ Dashboard & มือถือ</div>
+  <div class="chk">
+    <div class="row"><div class="num">12</div><div class="box"></div><div class="txt"><b>เปิดเว็บ HA</b> <span>→ ทุกการ์ดโหลดครบ ไม่มี "unavailable"</span></div></div>
+    <div class="row"><div class="num">13</div><div class="box"></div><div class="txt"><b>เปิดแอป HA มือถือ</b> (ตั้ง URL <code>http://&lt;EC2-IP&gt;:8123</code>) <span>→ คุมได้</span></div></div>
+    <div class="row"><div class="num">14</div><div class="box"></div><div class="txt"><b>กดปุ่มไฟ/พัดลม/โหมดใน dashboard</b> <span>→ อุปกรณ์จริงเปลี่ยน</span></div></div>
+  </div>
+
+  <div class="grp">D · 🏠 ระบบอัตโนมัติ</div>
+  <div class="chk">
+    <div class="row"><div class="num">15</div><div class="box"></div><div class="txt"><b>เดินเข้าห้องตอนมืด</b> <span>→ ไฟติดเอง · กลางวันสว่าง → ไม่ติด</span></div></div>
+    <div class="row"><div class="num">16</div><div class="box"></div><div class="txt"><b>กดสวิตช์ปิดไฟเองตอนอยู่ในห้อง</b> <span>→ ไฟอยู่นิ่ง 30 นาที ไม่เด้งติด</span></div></div>
+    <div class="row"><div class="num">17</div><div class="box"></div><div class="txt"><b>สั่ง Away</b> <span>→ ไฟ/พัดลมดับ + ประตูล็อก + โรงรถปิด</span></div></div>
+    <div class="row"><div class="num">18</div><div class="box"></div><div class="txt"><b>สั่ง Sleep</b> <span>→ ไฟดับ + ม่านปิด · ขยับบนเตียง → ไม่เด้ง</span></div></div>
+    <div class="row"><div class="num">19</div><div class="box"></div><div class="txt"><b>เปิดประตูโรงรถทิ้งไว้ 5 นาที</b> <span>→ ปิดเอง</span></div></div>
+  </div>
+
+  <div class="grp">E · 🔌 Hardware</div>
+  <div class="chk">
+    <div class="row"><div class="num">20</div><div class="box"></div><div class="txt"><b>คุมหลอด Tuya + พัดลม Zigbee จาก HA</b> <span>→ ทำงาน</span></div></div>
+    <div class="row"><div class="num">21</div><div class="box"></div><div class="txt"><b>ESP32 4 โซน</b> (นั่งเล่น/ครัว/นอน/โรงรถ) <span>→ ค่าเซนเซอร์สดใน dashboard</span></div></div>
+    <div class="row"><div class="num">22</div><div class="box"></div><div class="txt"><b>เปลี่ยนแบต door sensor (CR2477)</b> <span>→ เปิด-ปิดประตู contact เปลี่ยน</span></div></div>
+  </div>
+
+  <div class="grp">F · 🚨 ความปลอดภัย (ระวังของจริง)</div>
+  <div class="chk">
+    <div class="row"><div class="num">23</div><div class="box"></div><div class="txt"><b>จิ้มน้ำที่เซนเซอร์น้ำรั่ว</b> <span>→ LINE เตือน + ไฟแดง</span></div></div>
+    <div class="row"><div class="num">24</div><div class="box"></div><div class="txt"><b>ทดสอบแก๊ส (จ่อเบาๆ)</b> <span>→ ไฟแดง + พัดลมระบาย + LINE</span></div></div>
+    <div class="row"><div class="num">25</div><div class="box"></div><div class="txt"><b>นั่งนิ่งในห้องน้ำ &gt;5 นาที</b> <span>→ ทดสอบแจ้งเตือนคนล้ม</span></div></div>
+  </div>
+</section>
+
+</div>
+
+<footer><div class="wrap">
+  <b>Smart Home AIoT</b> — คู่มือบ้านอัจฉริยะ · Athit "Mos" Boonpinit · Bangkok University CE08<br>
+  <span class="pill">244 entities</span><span class="pill">79 automations</span><span class="pill">Claude Haiku 4.5</span><span class="pill">Home Assistant + MQTT</span><span class="pill">Zigbee + ESP32</span><span class="pill">อัปเดต 23 มิ.ย. 2569</span>
+</div></footer>
+
+</body>
+</html>
