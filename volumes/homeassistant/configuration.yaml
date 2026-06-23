@@ -1089,10 +1089,16 @@ automation manual:
 
   # ── รดน้ำอัตโนมัติ 07:00 ──────────────────────────────────────
   - alias: "🌅 รดน้ำอัตโนมัติ 07:00"
-    description: "เปิดปั๊มน้ำ 07:00 นาน 10 นาที แล้วปิดเอง"
+    description: "07:00 รดน้ำ 10 วิ — เฉพาะดินแห้ง (<50%) และไม่ฝน (กันรดดินเปียก/สแปม)"
     trigger:
       - platform: time
         at: "07:00:00"
+    condition:
+      - condition: numeric_state
+        entity_id: sensor.garden_soil_moisture
+        below: 50
+      - condition: template
+        value_template: "{{ states('weather.forecast_baan') not in ['rainy','pouring','lightning-rainy','lightning'] }}"
     action:
       - service: switch.turn_on
         target:
@@ -1101,11 +1107,6 @@ automation manual:
       - service: switch.turn_off
         target:
           entity_id: switch.garden_water_pump
-      - service: rest_command.send_alert
-        data:
-          alert_type: "pump_done"
-          value: "10"
-          room: "garden"
 
   # ── GPS Auto Away: ออกจากบ้าน → Away Mode ────────────────────
   - alias: "📍 GPS - ออกจากบ้าน → Away Mode"
